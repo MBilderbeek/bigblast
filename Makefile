@@ -5,7 +5,7 @@ LIBS=-lg -lf
 EXTRAS=loadgrp.o
 OTHERFILES=SHIPS.COP
 DOSFILEPATH=./disk/
-EMULATOR=openmsx
+EMULATOR=openmsxmy
 EMUDISK=-diska
 
 OBJECTS=bigblast.o \

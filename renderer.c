@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.10 2002/11/19 23:18:15 manuel Exp $
+/* $Id: renderer.c,v 1.11 2002/11/21 23:46:58 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -40,13 +40,13 @@
 #define FONT_H 8
 #define FONT_CPL 42 // Nof characters on a line
 
-#define SCORE_Y (211-FONT_H+2) // go to the edge; compensate for empty line
+#define SCORE_Y (212-FONT_H+1) // go to the edge; compensate for empty line
 #define SCORE_X 0
 #define LIVES_Y (SCORE_Y)
 #define LIVES_X (256-8*(FONT_W))
 
 #define SHIELD_O_METER_H 5
-#define SHIELD_O_METER_Y (212-SHIELD_O_METER_H)
+#define SHIELD_O_METER_Y (212-SHIELD_O_METER_H-1)
 #define SHIELD_O_METER_X ((256-64)>>1)
 
 #define	C_TRANSP 0
@@ -120,10 +120,19 @@ void playscreen_init()
 {
 	setpg(GAMEPAGE,BGPAGE);
 	generate_background();
-	boxline(0,0, 255,211, 1, PSET);
-
+	boxline(0,0, 255,211-8, 1, PSET);
+	
 	cpyv2v(0,0, 255,211, BGPAGE, 0,0, GAMEPAGE, PSET);
+	
+	write("Score:", SCORE_X, SCORE_Y);
+	write("Lives:", LIVES_X, LIVES_Y);
+
 	setpg(GAMEPAGE,GAMEPAGE);
+	
+	boxline (SHIELD_O_METER_X,SHIELD_O_METER_Y, 
+		 SHIELD_O_METER_X+63+2,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
+		 C_WHITE, PSET);
+	
 }
 	
 
@@ -133,7 +142,7 @@ static void generate_background()
 	cls();
 	for (i=0; i<100; i++)
 	{
-		pset(rand()%256,rand()%212,rand()%14+2,PSET);
+		pset(rand()%256,rand()%(212-8),rand()%14+2,PSET);
 	}
 }
 	
@@ -338,9 +347,6 @@ static void render_info(char noflives)
 	char shield_stat = the_ship.shield_energy >> 2;
 	char str[7+6];
 	
-	boxline (SHIELD_O_METER_X,SHIELD_O_METER_Y, 
-		 SHIELD_O_METER_X+63+2,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
-		 C_WHITE, PSET);
 	if (shield_stat>0)
 		boxfill (SHIELD_O_METER_X+1,SHIELD_O_METER_Y+1,
 			SHIELD_O_METER_X+shield_stat,
@@ -350,12 +356,12 @@ static void render_info(char noflives)
 		boxfill (SHIELD_O_METER_X+shield_stat+1,SHIELD_O_METER_Y+1, 
 			SHIELD_O_METER_X+64-2,
 			SHIELD_O_METER_Y+SHIELD_O_METER_H-2, C_BLACK, PSET);
-
-	sprintf(str, "Score: %05d", score);
-	write(str, SCORE_X, SCORE_Y);
 	
-	sprintf(str, "Lives: %d", noflives);
-	write(str, LIVES_X, LIVES_Y);
+	sprintf(str, "%05d", score);
+	write(str, SCORE_X+7*FONT_W, SCORE_Y);
+	
+	sprintf(str, "%d", noflives);
+	write(str, LIVES_X+7*FONT_W, LIVES_Y);
 }
 
 

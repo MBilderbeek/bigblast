@@ -1,4 +1,9 @@
-$Id: ChangeLog,v 1.5 2002/11/19 23:18:15 manuel Exp $
+$Id: ChangeLog,v 1.6 2002/11/21 23:46:58 manuel Exp $
+
+2002/11/22 Manuel & Eric
+	* Reduced playing ground ;-)
+	* Added a bit of random to the debris direction (might be buggy!)
+	* Writing of Lives and Score is more efficient, also Shield-O-Meter(r)
 
 2002/11/20 Manuel
 	* Added write and write_cent functions to print with nice font

@@ -1,6 +1,6 @@
-- Indicatoren: aantal levens, score
 - een "kill all objects", zodat met render_frame() automatisch scores kunnen worden geupdate
 - beetje: beter asteroids kunnen raken met kogels (dia tuning)
+- er gaat misschien iets mis bij het bepalen van de richtingen van het debris
 - een klaar (levels?).
 - andere vijanden
 - eventuele optimalisaties van het e.e.a., vooral de collisiondetection

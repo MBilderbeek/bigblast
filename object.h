@@ -1,4 +1,4 @@
-/* $Id: object.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: object.h,v 1.3 2002/11/21 23:46:58 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -15,7 +15,7 @@
  */
 
 #define OBJ_MAX_X (4*960)
-#define OBJ_MAX_Y (4*784)
+#define OBJ_MAX_Y (4*752)
 
 #define OBJ_MAX_DXY (63)
 
