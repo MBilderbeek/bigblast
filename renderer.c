@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.13 2002/12/27 00:26:06 manuel Exp $
+/* $Id: renderer.c,v 1.14 2003/01/12 23:03:29 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -179,17 +179,6 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	if (the_ship.shield_energy > 0 && shield == ON)
 		the_ship.shield_energy--;
 	
-	sx = (the_ship.heading & 0x0F) << 4; 
-	sy = the_ship.heading & 0xF0; 
-
-	dx = OBJ2GFX( x_cur );
-	dy = OBJ2GFX( y_cur );
-	dx_prev = OBJ2GFX( x_prev );
-	dy_prev = OBJ2GFX( y_prev );
-	
-	if (boost == ON) 
-		sy+=BOOST_OFFSET;
-	
 	if ( (x_cur != x_prev) || (y_cur != y_prev) ||
 	     (the_ship.heading != the_ship.heading_prev) ||
 	     (object_get_state(the_ship.ship_obj) == NEW)||
@@ -199,11 +188,20 @@ static void render_ship(onoff_t boost, onoff_t shield)
 		if ( object_get_state(the_ship.ship_obj) == NEW )
 			object_set_state(the_ship.ship_obj, ALIVE);
 		else
+		{
+			dx_prev = OBJ2GFX( x_prev );
+			dy_prev = OBJ2GFX( y_prev );
 			cpyv2v(dx_prev, dy_prev, dx_prev+SHIP_TILE_SIZE-1, 
 				dy_prev+SHIP_TILE_SIZE-1, BGPAGE,
 			       dx_prev, dy_prev, GAMEPAGE, PSET);
+		}
 		if (object_get_state(the_ship.ship_obj) != DYING)
 		{
+			dx = OBJ2GFX( x_cur );
+			dy = OBJ2GFX( y_cur );
+			sx = (the_ship.heading & 0x0F) << 4; 
+			sy = the_ship.heading & 0xF0; 
+			if (boost == ON) sy+=BOOST_OFFSET;
 			cpyv2v(sx, sy, sx+SHIP_TILE_SIZE-1, sy+SHIP_TILE_SIZE-1,
 				GFXPAGE, dx, dy, GAMEPAGE, TPSET);
 			if(shield)
@@ -232,13 +230,6 @@ static void render_asteroids()
 	
 	for (i=0; i<MAX_NOF_ASTEROIDS; i++)
 	{
-		switch (the_asteroids[i].size)
-		{
-			case AST_BIG:    sx=AST_SX_BIG;    break;
-		 	case AST_MEDIUM: sx=AST_SX_MEDIUM; break;
-			case AST_SMALL:  sx=AST_SX_SMALL;  break;
-			default: break;
-		}
 		
 		if (the_asteroids[i].size != AST_NONE)
 		{
@@ -248,27 +239,36 @@ static void render_asteroids()
 					the_asteroids[i].asteroid_obj);
 			y_prev = object_get_y_prev(
 					the_asteroids[i].asteroid_obj);
-			state = object_get_state(the_asteroids[i].asteroid_obj);
 
-			dx = OBJ2GFX( x_cur );
-			dy = OBJ2GFX( y_cur );
-			dx_prev = OBJ2GFX( x_prev );
-			dy_prev = OBJ2GFX( y_prev );
 
 			if ( (x_cur != x_prev) || (y_cur != y_prev) )
 			{
+				dx_prev = OBJ2GFX( x_prev );
+				dy_prev = OBJ2GFX( y_prev );
 				cpyv2v(dx_prev, dy_prev, 
 				       dx_prev+AST_TILE_SIZE-1, 
 				       dy_prev+AST_TILE_SIZE-1, 
 				       BGPAGE, dx_prev, dy_prev, GAMEPAGE,
 				       PSET);
+				state = object_get_state(the_asteroids[i].asteroid_obj);
 				if(state != DYING)
+				{
+					switch (the_asteroids[i].size)
+					{
+						case AST_BIG:    sx=AST_SX_BIG;    break;
+					 	case AST_MEDIUM: sx=AST_SX_MEDIUM; break;
+						case AST_SMALL:  sx=AST_SX_SMALL;  break;
+						default: break;
+					}
+					dx = OBJ2GFX( x_cur );
+					dy = OBJ2GFX( y_cur );
 					cpyv2v(sx+(animstep*AST_TILE_SIZE), 
 						AST_SY, 
 						sx+(animstep+1)*AST_TILE_SIZE-1,
 						AST_SY+AST_TILE_SIZE-1,
 						GFXPAGE, dx, dy, GAMEPAGE,
 						TPSET);
+				}
 			}
 		}
 	}
@@ -293,8 +293,6 @@ static void render_bullets()
 					the_bullets[i].bullet_obj);
 			y_prev = object_get_y_prev(
 					the_bullets[i].bullet_obj);
-			dx = OBJ2GFX( x_cur );
-			dy = OBJ2GFX( y_cur );
 			dx_prev = OBJ2GFX( x_prev );
 			dy_prev = OBJ2GFX( y_prev );
 
@@ -304,9 +302,13 @@ static void render_bullets()
 			       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
 			if (object_get_state(the_bullets[i].bullet_obj)
 					!= DYING)
+			{
+				dx = OBJ2GFX( x_cur );
+				dy = OBJ2GFX( y_cur );
 				boxfill(dx, dy, dx+BULLET_TILE_SIZE-1, 
 					dy+BULLET_TILE_SIZE-1, 
 					15, PSET); // temporary
+			}
 
 /*			cpyv2v(sx+(BULLET_TILE_SIZE), BULLET_SY, 
 			       sx+BULLET_TILE_SIZE-1, 
