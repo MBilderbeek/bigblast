@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.19 2003/03/14 00:49:35 manuel Exp $
+/* $Id: bigblast.c,v 1.20 2003/03/20 23:47:31 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -37,6 +37,7 @@
 
 int *JIFFY = (int *)0xFC9E;
 unsigned int score;
+unsigned int hiscore=0;
 unsigned char level;
 static char quit=0;
 static char noflives;
@@ -152,7 +153,10 @@ void play_level(char level)
 				if (shield)
 				{
 					if (the_ship.shield_energy > AST_SH_PENALTY)
-						the_ship.shield_energy-=AST_SH_PENALTY;
+					{
+						if (the_ship.shield_energy < AUTOSHIELD_THRESHOLD)
+							the_ship.shield_energy-=AST_SH_PENALTY;
+					}
 					else
 						the_ship.shield_energy=0;
 				}
@@ -212,9 +216,15 @@ void play_game()
 	
 		sprintf(string,"Total score: %d points", score);
 		write_cent(string, MSG_BASE+80);
+		
+		if (score>hiscore)
+		{		
+			write_cent("A new high score!", MSG_BASE+100);
+			hiscore=score;
+		}
 
 		sprintf(string,"You reached wave %d", level);
-		write_cent(string, MSG_BASE+100);
+		write_cent(string, MSG_BASE+120);
 	
 		*JIFFY = 0;
 		while (*JIFFY<100);
@@ -240,6 +250,8 @@ void main ()
 		cls();
 		sprintf(string,"Welcome to Big Blast!");
 		write_cent(string, MSG_BASE);
+		sprintf(string,"High Score: %05d", hiscore);
+		write_cent(string, 212-10);
 		init_menu();
 		while (keypressed());
 		switch (menu_select())

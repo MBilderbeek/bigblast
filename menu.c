@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.2 2003/02/16 15:34:01 eric Exp $
+/* $Id: menu.c,v 1.3 2003/03/20 23:47:31 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -20,7 +20,7 @@
  * LOCAL DEFINITIONS
  */
 
-#define MENU_BASE_X 100
+#define MENU_BASE_X (128-(FONT_W*2))
 #define MENU_BASE_Y 150 
 #define MENU_ITEM_H (FONT_H+2)
 

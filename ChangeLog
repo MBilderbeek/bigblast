@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.22 2003/03/14 00:49:35 manuel Exp $
+$Id: ChangeLog,v 1.23 2003/03/20 23:47:31 manuel Exp $
+
+2003/03/21 Eric & Manuel
+	* Added high scores
+	* Attempt to fix tinkeroid bug
 
 2003/03/14 Eric & Manuel
 	* Code cleanup in collision detection

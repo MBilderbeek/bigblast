@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.21 2003/03/01 22:56:57 eric Exp $
+/* $Id: renderer.c,v 1.22 2003/03/20 23:47:31 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -141,7 +141,7 @@ void playscreen_init()
 	setpg(GAMEPAGE,GAMEPAGE);
 	
 	write("Score:", SCORE_X, SCORE_Y);
-	write("Lives:", LIVES_X, LIVES_Y);
+	write("Ships:", LIVES_X, LIVES_Y);
 
 	boxline (SHIELD_O_METER_X,SHIELD_O_METER_Y, 
 		 SHIELD_O_METER_X+63+1,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
