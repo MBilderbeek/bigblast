@@ -1,8 +1,15 @@
 - optimalisatie: hou aantal astroids/kogels/explosies bij zodat als je ze
-  allemaal gehad hebt je niet meer hoeft te zoeken -> implementeren voor kogels?
+  allemaal gehad hebt je niet meer hoeft te zoeken -> implementeren voor
+  kogels?
 - beetje: beter asteroids kunnen raken met kogels (dia tuning)
 - echtere levels
 - andere vijanden
 - eventuele optimalisaties van het e.e.a., vooral de collisiondetection
 - graphics
 - geluid
+- Bugs fixen:
+  - afkap werkt niet goed voor kleine objecten -> gebruik een size bij objecten
+  - Als je 't level haalt met je laatste leven door kapot te gaan tegen de
+    laatste asteroide krijg je troep
+  - als je een shield penalty krijgt als je net begint blijft er 'n streepje
+    staan
