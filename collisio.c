@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.8 2003/01/12 23:03:56 manuel Exp $
+/* $Id: collisio.c,v 1.9 2003/02/14 00:17:15 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -59,7 +59,7 @@ static int get_ast_dia(ast_hdl_t i)
 	return ast_dia;
 }
 
-char ship_hit(onoff_t shield)
+char ship_hit(void)
 {
 	char i, hit=0;
 	int ship_x = object_get_x(the_ship.ship_obj); 
@@ -98,21 +98,20 @@ char ship_hit(onoff_t shield)
 						     delta_x >> (3 - ast_size), delta_y >> (3 - ast_size));
 
 					/* ast loses (part of) its momentum */
-					object_accel(ast_obj,
-						     -(delta_x >> ast_size), -(delta_y >> ast_size));
+					// But this looks unnatural since it is
+					// only debris!
+					//object_accel(ast_obj,
+					//	     -(delta_x >> ast_size), -(delta_y >> ast_size));
 
 					ship_dx = object_get_dx(the_ship.ship_obj); 
 					ship_dy = object_get_dy(the_ship.ship_obj); 
 					
 					object_set_state(ast_obj, DYING);
-					if (!shield) hit = 1;
+					hit = 1;
 				}
 			}
 		}
 
-	}
-	if (hit && !shield){
-		object_set_state(the_ship.ship_obj,DYING);
 	}
 	return (hit);
 }

@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.11 2003/02/07 01:38:46 manuel Exp $
+/* $Id: bigblast.c,v 1.12 2003/02/14 00:17:15 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -84,7 +84,7 @@ static void add_bonus(unsigned char level, unsigned char noflives)
 void play_level(char level)
 {
 	onoff_t fire = OFF;
-	int i;
+	int i, shipkaboom=0;
 	ast_hdl_t a=0;
 	char string[100];
 	
@@ -122,26 +122,34 @@ void play_level(char level)
 	while (!quit && noflives!=0 && nof_asteroids>0)
 	{
 		render_frame(boost, shield, noflives);
-		check_controls(&rotdir, &boost, &shield, &fire);
-		ship_rotate(rotdir);
-		if (boost==ON) ship_accel();
-		ship_move(); // en schiet op een beetje!
+		bullets_n_asteroids();
+		if (the_ship.ship_obj!=OBJ_VOID)
+		{
+			check_controls(&rotdir, &boost, &shield, &fire);
+			ship_rotate(rotdir);
+			if (boost==ON) ship_accel();
+			ship_move(); // en schiet op een beetje!
+			ship_shield_set(shield);
+			if (fire) bullet_fire();
+			if (object_get_state(the_ship.ship_obj)==DYING)
+			{
+				ship_destroy();
+				boost=OFF;
+				shipkaboom=8;
+			}
+			else if (ship_hit() && (!shield))
+			{
+				object_set_state(the_ship.ship_obj,DYING);
+			}	
+		}
+		else
+		{
+			if (!(shipkaboom--) && (--noflives)) 
+				ship_init();
+		}	
 		asteroids_move();
 		bullets_move();
 		explosions_move();
-		bullets_n_asteroids();
-		ship_shield_set(shield);
-		if (object_get_state(the_ship.ship_obj)==DYING)
-		{
-			ship_reset();
-			boost=OFF;
-		}
-		else if (ship_hit(shield))
-		{
-			beep(); // explosion function should be here
-			noflives--;
-		}	
-		if (fire) bullet_fire();
 		quit=check_quit();
 	}
 	render_info(noflives); // update noflives on screen

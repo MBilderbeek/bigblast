@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.16 2003/02/07 01:38:46 manuel Exp $
+/* $Id: renderer.c,v 1.17 2003/02/14 00:17:15 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -110,6 +110,7 @@ void render_init()
 	strcpy(filename,"\"SHIPS.COP\""); 
 	loadgrp(filename, 0, 0, GFXPAGE);
 	boxfill(0,0, 255,211, 0, PSET); // wipe screen
+	*Timer=0;
 }
 
 void playscreen_init()
@@ -151,14 +152,12 @@ static void generate_background()
 
 void render_frame(onoff_t boost, onoff_t shield, char noflives)
 {
-	while (*Timer<5);
-	*Timer=0;
-	frame_counter++;
-	render_ship(boost, shield);
-	render_asteroids();
-	render_bullets();
-	render_explosions();
-	render_info(noflives);
+#ifdef DEBUG_FPS
+	line(0,0,25,0,1,PSET);
+	line(0,0,*Timer,0,15,PSET);
+	pset(4,1,8,PSET);
+	pset(9,1,8,PSET);
+#endif
 #ifdef DEBUG_RENDERER
 	{
 		int i;
@@ -168,6 +167,14 @@ void render_frame(onoff_t boost, onoff_t shield, char noflives)
 		}
 	}
 #endif
+	while (*Timer<6);
+	*Timer=0;
+	frame_counter++;
+	if (the_ship.ship_obj!=OBJ_VOID) render_ship(boost, shield);
+	render_asteroids();
+	render_bullets();
+	render_explosions();
+	render_info(noflives);
 }
 
 static void render_ship(onoff_t boost, onoff_t shield)
@@ -389,7 +396,7 @@ static void render_explosions()
 				}
 				dx_prev+=offset;
 				dy_prev+=offset;
-				tilesize-=(offset<<1)-2;
+				tilesize-=(offset<<1)/*-2*/;
 				cpyv2v(dx_prev, dy_prev, 
 				       dx_prev+tilesize, 
 				       dy_prev+tilesize, 

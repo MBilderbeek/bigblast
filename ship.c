@@ -1,4 +1,4 @@
-/* $Id: ship.c,v 1.4 2002/12/26 23:54:11 manuel Exp $
+/* $Id: ship.c,v 1.5 2003/02/14 00:17:15 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -12,6 +12,7 @@
 
 #include "object.h"
 #include "ship.h"
+#include "explosio.h"
 
 /*
  * LOCAL DEFINITIONS
@@ -72,7 +73,15 @@ void ship_init()
 
 void ship_destroy()
 {
+	// explode! HAHAHAHAAAAA!
+	explosion_create(object_get_x(the_ship.ship_obj), 
+			object_get_y(the_ship.ship_obj), 
+			EXP_BIG, object_get_dx(the_ship.ship_obj),
+			object_get_dy(the_ship.ship_obj));
+	beep();
+	
 	object_destroy(&(the_ship.ship_obj));
+        
 }
 
 void ship_reset()

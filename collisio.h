@@ -1,4 +1,4 @@
-/* $Id: collisio.h,v 1.3 2002/10/05 20:31:45 eric Exp $
+/* $Id: collisio.h,v 1.4 2003/02/14 00:17:15 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -19,6 +19,6 @@
  * DEFINITIONS
  */
 
-char ship_hit(onoff_t shield);
+char ship_hit(void);
 
 #endif

@@ -1,4 +1,9 @@
-$Id: ChangeLog,v 1.13 2003/02/07 01:38:46 manuel Exp $
+$Id: ChangeLog,v 1.14 2003/02/14 00:17:15 manuel Exp $
+
+2003/02/14 Eric & Manuel
+	* Explosions fine tuned (New and Improved!)
+	* Ship explosion added (ship EOL)
+	* Cleanups in ship_hit
 
 2003/02/07 Eric & Manuel
 	* Explosions added
