@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.20 2003/02/28 00:24:34 manuel Exp $
+$Id: ChangeLog,v 1.21 2003/03/01 22:58:49 eric Exp $
+
+2003/03/02 Eric
+	* Added an UFO - it just flies
+	* Improved graphics for explosions, steel asteroid, shield and ufo
 
 2003/02/28 Manuel & Eric
 	* Added 'tink'able asteroids (steel!)
