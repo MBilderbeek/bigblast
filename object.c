@@ -1,4 +1,4 @@
-/* $Id: object.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: object.c,v 1.3 2003/02/16 15:34:01 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -41,14 +41,14 @@ void objects_init (void)
 		the_object->y_prev = 0; 
 		the_object->dx = 0;
 		the_object->dy = 0;
-		the_object->type = OBJ_UNUSED;
+		the_object->size = 0;
 		the_object++;
 	}
 
 	object_last = 0;
 }
 
-obj_hdl_t object_create(int x, int y, char dx, char dy, object_e type)
+obj_hdl_t object_create(int x, int y, char dx, char dy, int size)
 {
 
 	int i;
@@ -56,17 +56,17 @@ obj_hdl_t object_create(int x, int y, char dx, char dy, object_e type)
 	
 	for (i = 0; i < NOFOBJECTS; i++)
 	{	
-		if (the_object->type == OBJ_UNUSED)
+		if (the_object->size == 0)
 		{
-			the_object->x = x + OBJ_MAX_X;
-			the_object->x %= OBJ_MAX_X;
-			the_object->y = y + OBJ_MAX_Y;
-			the_object->y %= OBJ_MAX_Y;
+			the_object->x = x + OBJ_MAX_X - size;
+			the_object->x %= (OBJ_MAX_X - size);
+			the_object->y = y + OBJ_MAX_Y - size;
+			the_object->y %= (OBJ_MAX_Y - size);
 			the_object->x_prev = the_object->x; 
 			the_object->y_prev = the_object->y;
 			the_object->dx = dx;
 			the_object->dy = dy;
-			the_object->type = type;
+			the_object->size = size;
 			the_object->state = NEW;
 			break; // exit for loop
 		}
@@ -80,7 +80,7 @@ obj_hdl_t object_create(int x, int y, char dx, char dy, object_e type)
 
 void object_destroy(obj_hdl_t *object)
 {
-		objects[*object].type = OBJ_UNUSED;
+		objects[*object].size = 0;
 		*object = OBJ_VOID;
 }
 
@@ -123,9 +123,9 @@ int object_get_dy(obj_hdl_t object)
 	return (objects[object].dy);
 }
 
-int object_get_type(obj_hdl_t object)
+int object_get_size(obj_hdl_t object)
 {
-	return (objects[object].type);
+	return (objects[object].size);
 }
 
 state_e object_get_state(obj_hdl_t object)
@@ -142,17 +142,22 @@ void object_move(obj_hdl_t object)
 {
 	object_t *the_object = &(objects[object]);
 	int temp; // wat een kutcompiler zeg!
+	int limit;
 
 	the_object->x_prev = the_object->x;
 	the_object->y_prev = the_object->y;
 	
-	temp = the_object->dx + OBJ_MAX_X;
-	the_object->x += temp;
-	the_object->x %= OBJ_MAX_X;
-	
-	temp = the_object->dy + OBJ_MAX_Y;
-	the_object->y += temp;
-	the_object->y %= OBJ_MAX_Y;
+	limit = OBJ_MAX_X - the_object->size;
+	temp = the_object->x + the_object->dx;
+	if ( temp < 0 ) temp += limit;
+	if ( temp >= limit ) temp -= limit;
+	the_object->x = temp;
+
+	limit = OBJ_MAX_Y - the_object->size;
+	temp = the_object->y + the_object->dy;
+	if ( temp < 0 ) temp += limit;
+	if ( temp >= limit ) temp -= limit;
+	the_object->y = temp;
 }
 
 void object_accel(obj_hdl_t object, char ddx, char ddy)

@@ -1,5 +1,11 @@
-$Id: ChangeLog,v 1.16 2003/02/15 12:03:56 manuel Exp $
+$Id: ChangeLog,v 1.17 2003/02/16 15:34:01 eric Exp $
 
+2003/02/17 Eric
+	* Improved separation between renderer and object behviour by
+	  introducing 'size' field in objects.
+	* Some code cleanup, while at it
+	* Moved shield energy decrease to ship.c 
+	
 2003/02/16 Manuel
 	* Implemented optimalization by counting number of asteroids and
 	  explosions already found when processing their arrays (not for

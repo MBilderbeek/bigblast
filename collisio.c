@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.10 2003/02/15 12:03:56 manuel Exp $
+/* $Id: collisio.c,v 1.11 2003/02/16 15:34:01 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -15,19 +15,15 @@
 #include "ship.h"
 #include "asteroid.h"
 #include "bullet.h"
-#include "renderer.h"
 #include "scores.h"
 
 /*
  * LOCAL DEFINITIONS
  */
 
-#define AST_BIG_DIA (AST_TILE_SIZE - 2)
-#define AST_MEDIUM_DIA (AST_TILE_SIZE - 4)
-#define AST_SMALL_DIA (AST_TILE_SIZE - 8)
+#define AST_SHIP_SLACK GFX2OBJ(4)
 
-#define SHIP_DIA (SHIP_TILE_SIZE - 4)
-
+static void bullets_n_one_ast(obj_hdl_t ast_obj);
 /*
  * EXTERNAL FUNCTIONS
  */
@@ -37,43 +33,29 @@ static int iabs(int i)
 	return (i > 0)? i: -i;
 }
 
-static int get_ast_dia(ast_hdl_t i)
+static int get_center_x(obj_hdl_t obj)
 {
-	int ast_dia;
+	return object_get_x(obj) + (object_get_size(obj) >> 1);
+}
 
-	switch (the_asteroids[i].size)
-	{
-		case AST_BIG:
-			ast_dia = GFX2OBJ(AST_BIG_DIA);
-			break;
-	 	case AST_MEDIUM:
-			ast_dia = GFX2OBJ(AST_MEDIUM_DIA);
-			break;
-	 	case AST_SMALL:
-			ast_dia = GFX2OBJ(AST_SMALL_DIA);
-			break;
-		default:
-			break;
-	}
-
-	return ast_dia;
+static int get_center_y(obj_hdl_t obj)
+{
+	return object_get_y(obj) + (object_get_size(obj) >> 1);
 }
 
 char ship_hit(void)
 {
-	char i, hit=0;
-	int ship_x = object_get_x(the_ship.ship_obj); 
-	int ship_y = object_get_y(the_ship.ship_obj); 
-	char ship_dx = object_get_dx(the_ship.ship_obj); 
-	char ship_dy = object_get_dy(the_ship.ship_obj);
+	char      i, hit   = 0;
+	obj_hdl_t ship_obj = the_ship.ship_obj;
+	int       ship_x   = get_center_x(ship_obj); 
+	int       ship_y   = get_center_y(ship_obj); 
+	char      ship_dx;
+	char      ship_dy;
 	obj_hdl_t ast_obj;
 	astsize_e ast_size;
-	int ast_x, ast_y;
-	int delta_x, delta_y, delta_dia;
-	char counter=0;
-
-	ship_x += GFX2OBJ(SHIP_TILE_SIZE) >> 1;
-	ship_y += GFX2OBJ(SHIP_TILE_SIZE) >> 1;
+	int       ast_x, ast_y;
+	int       delta_x, delta_y, delta_dia;
+	char      counter = 0;
 
 	for (i=0; i<MAX_NOF_ASTEROIDS && !hit && counter<=nof_asteroids; i++)
 	{
@@ -81,39 +63,48 @@ char ship_hit(void)
 		{
 			counter++;
 			ast_obj = the_asteroids[i].asteroid_obj;
-			delta_dia = (get_ast_dia(i) + GFX2OBJ(SHIP_DIA)) >> 1;
-			ast_x = object_get_x(ast_obj) + ( GFX2OBJ(AST_TILE_SIZE) >> 1 );
+
+			delta_dia = object_get_size(ast_obj);
+			ast_x = get_center_x(ast_obj);
+			
+			delta_dia += object_get_size(ship_obj)-AST_SHIP_SLACK;
+			delta_dia >>= 1;
+			
 			delta_x = ast_x - ship_x;
 			if (iabs(delta_x) <= delta_dia)
 			{
-				ast_y = object_get_y(ast_obj) + ( GFX2OBJ(AST_TILE_SIZE) >> 1 );
+				ast_y = get_center_y(ast_obj);
 				delta_y = ast_y - ship_y;
 				if (iabs(delta_y) <= delta_dia)
 				{
-					/* calc speed of asteroid with respect to ship (ast's momentum) */
-					delta_x = object_get_dx(ast_obj) - ship_dx;
-					delta_y = object_get_dy(ast_obj) - ship_dy;
+					ship_dx = object_get_dx(ship_obj); 
+					ship_dy = object_get_dy(ship_obj); 
+					/* calc speed of asteroid with respect
+					 * to ship (ast's momentum) */
+					delta_x = object_get_dx(ast_obj)
+						  - ship_dx;
+					delta_y = object_get_dy(ast_obj)
+						  - ship_dy;
 					ast_size = the_asteroids[i].size;
 
 					/* ship gets (part of) ast's momentum */
 					object_accel(the_ship.ship_obj,
-						     delta_x >> (3 - ast_size), delta_y >> (3 - ast_size));
+						   delta_x >> (3 - ast_size),
+						   delta_y >> (3 - ast_size));
 
 					/* ast loses (part of) its momentum */
 					// But this looks unnatural since it is
 					// only debris!
 					//object_accel(ast_obj,
-					//	     -(delta_x >> ast_size), -(delta_y >> ast_size));
+					//	     -(delta_x >> ast_size),
+					//	     -(delta_y >> ast_size));
 
-					ship_dx = object_get_dx(the_ship.ship_obj); 
-					ship_dy = object_get_dy(the_ship.ship_obj); 
 					
 					object_set_state(ast_obj, DYING);
 					hit = 1;
 				}
 			}
 		}
-
 	}
 	return (hit);
 }
@@ -121,13 +112,10 @@ char ship_hit(void)
 
 void bullets_n_asteroids()
 {
-	int i, b;
-	int ax, ay;
-	int bx, by;
-	int dx, dy;
-	int dia;
+	int i;
 	char counter=0;
 
+	obj_hdl_t ast_obj;
 	state_e ast_state;
 	
 	for (i=0; i<MAX_NOF_ASTEROIDS && counter<=nof_asteroids; i++)		
@@ -135,8 +123,8 @@ void bullets_n_asteroids()
 		if(the_asteroids[i].size != AST_NONE)
 		{
 			counter++;
-			ast_state = 
-			    object_get_state(the_asteroids[i].asteroid_obj);
+			ast_obj = the_asteroids[i].asteroid_obj;
+			ast_state = object_get_state(ast_obj);
 
 			switch(ast_state)
 			{
@@ -152,32 +140,7 @@ void bullets_n_asteroids()
 				break;
 			case ALIVE:
 			case NEW:
-				ax =
-				   object_get_x(the_asteroids[i].asteroid_obj)
-				   + ( GFX2OBJ(AST_TILE_SIZE) >> 1 );
-				ay =
-				   object_get_y(the_asteroids[i].asteroid_obj)
-				   + ( GFX2OBJ(AST_TILE_SIZE) >> 1 );
-				dia = get_ast_dia(i) >> 1;
-	
-				for (b=0; b<MAX_NOF_BULLETS; b++)
-				{
-					if(the_bullets[b].age > 1)
-					{
-						bx = object_get_x(the_bullets[b].bullet_obj);
-						dx = ax - bx;
-						if (iabs(dx) <= dia)
-						{
-							by = object_get_y(the_bullets[b].bullet_obj);
-							dy = ay - by;
-							if (iabs(dy) <= dia)
-							{
-								object_set_state(the_asteroids[i].asteroid_obj, DYING);
-								the_bullets[b].age = 1;
-							}
-						}
-					}
-				}
+				bullets_n_one_ast(ast_obj);
 				break;
 			default: break;
 			}
@@ -185,3 +148,33 @@ void bullets_n_asteroids()
 	}
 }
 
+static void bullets_n_one_ast(obj_hdl_t ast_obj)
+{
+	int ax = get_center_x(ast_obj);
+	int ay = get_center_y(ast_obj);
+	int ast_dia = object_get_size(ast_obj) >> 1;
+
+	int b, bx, by, bul_dia;
+
+	obj_hdl_t bul_obj;
+
+	for (b=0; b<MAX_NOF_BULLETS; b++)
+	{
+		if(the_bullets[b].age > 1)
+		{
+			bul_obj = the_bullets[b].bullet_obj;
+			bul_dia = object_get_size(bul_obj) >> 1;
+			bx = get_center_x(bul_obj);
+			if (iabs(ax-bx) <= ast_dia + bul_dia)
+			{
+				by = get_center_y(bul_obj);
+				if (iabs(ay-by) <= ast_dia + bul_dia)
+				{
+					object_set_state(ast_obj, DYING);
+					the_bullets[b].age = 1;
+				}
+			}
+		}
+	}
+}
+	

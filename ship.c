@@ -1,4 +1,4 @@
-/* $Id: ship.c,v 1.5 2003/02/14 00:17:15 manuel Exp $
+/* $Id: ship.c,v 1.6 2003/02/16 15:34:01 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -17,6 +17,8 @@
 /*
  * LOCAL DEFINITIONS
  */
+
+#define SHIP_SIZE (16 << OBJ_GFX_FACTOR)
 
 ship_t the_ship;
 
@@ -63,8 +65,10 @@ heading_table_t heading2dxdy =
 
 void ship_init()
 {
-	the_ship.ship_obj = object_create (OBJ_MAX_X / 2, OBJ_MAX_Y / 2, 
-				0, 0, OBJ_SHIP);
+	the_ship.ship_obj = object_create (
+			(OBJ_MAX_X - SHIP_SIZE)>>1,
+			(OBJ_MAX_Y - SHIP_SIZE)>>1, 
+			0, 0, SHIP_SIZE);
 	the_ship.heading = 3 * MAX_HEADING / 4;
 	the_ship.heading_prev = -1;
 	the_ship.shield_energy = MAX_SHIELD_ENERGY;
@@ -75,9 +79,9 @@ void ship_destroy()
 {
 	// explode! HAHAHAHAAAAA!
 	explosion_create(object_get_x(the_ship.ship_obj), 
-			object_get_y(the_ship.ship_obj), 
-			EXP_BIG, object_get_dx(the_ship.ship_obj),
-			object_get_dy(the_ship.ship_obj));
+			 object_get_y(the_ship.ship_obj), 
+			 EXP_BIG, object_get_dx(the_ship.ship_obj),
+			 object_get_dy(the_ship.ship_obj));
 	beep();
 	
 	object_destroy(&(the_ship.ship_obj));
@@ -99,7 +103,7 @@ void ship_rotate(rotdir_t direction)
 
 void ship_shield_set(onoff_t state)
 {
-	if (state == ON && the_ship.shield_energy > 0)
+	if (state == ON && the_ship.shield_energy-- > 0)
 		the_ship.shield_state = ON;
 	else
 		the_ship.shield_state = OFF;

@@ -1,4 +1,4 @@
-/* $Id: asteroid.c,v 1.10 2003/02/15 12:03:56 manuel Exp $
+/* $Id: asteroid.c,v 1.11 2003/02/16 15:34:01 eric Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -18,6 +18,10 @@
 /*
  * LOCAL DEFINITIONS
  */
+
+#define AST_BIG_SIZE  (16 << OBJ_GFX_FACTOR)
+#define AST_MED_SIZE  (11 << OBJ_GFX_FACTOR)
+#define AST_SMALL_SIZE (7 << OBJ_GFX_FACTOR)
 
 asteroid_t the_asteroids[MAX_NOF_ASTEROIDS];
 
@@ -57,13 +61,28 @@ void asteroids_move()
 ast_hdl_t asteroid_create(int x, int y, astsize_e size)
 {
 	ast_hdl_t i;
+	int obj_size;
 
 	for (i=0; i<MAX_NOF_ASTEROIDS; i++)
 	{
 		if (the_asteroids[i].asteroid_obj == OBJ_VOID)
 		{
+			switch(size)
+			{
+				case AST_BIG:
+					obj_size = AST_BIG_SIZE;
+					break;
+				case AST_MEDIUM:
+					obj_size = AST_MED_SIZE;
+					break;
+				case AST_SMALL:
+					obj_size = AST_SMALL_SIZE;
+					break;
+				default:
+					obj_size = 0;
+			}
 			the_asteroids[i].asteroid_obj = 
-				object_create (x, y, 0, 0, OBJ_AST);
+				object_create (x, y, 0, 0, obj_size);
 			the_asteroids[i].size = size;
 			nof_asteroids++;
 			break;

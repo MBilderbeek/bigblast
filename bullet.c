@@ -1,4 +1,4 @@
-/* $Id: bullet.c,v 1.4 2003/02/14 17:52:28 eric Exp $
+/* $Id: bullet.c,v 1.5 2003/02/16 15:34:01 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -12,15 +12,15 @@
 
 #include "object.h"
 #include "ship.h" // defines the heading2dxdy table
-#include "renderer.h"
 #include "bullet.h"
 
 /*
  * LOCAL DEFINITIONS
  */
 
-#define NEW_BULLET_AGE 12
-#define BULLET_SPEED(x) ((x) * 7)
+#define BULLET_SIZE      ((int)2 << OBJ_GFX_FACTOR)
+#define NEW_BULLET_AGE   12
+#define BULLET_SPEED(x)  ((x) << 2)
 
 bullet_t the_bullets[MAX_NOF_BULLETS];
 int nof_bullets;
@@ -69,17 +69,16 @@ void bullet_fire()
 	char heading = the_ship.heading;
 	char dx = BULLET_SPEED(heading2dxdy[heading].x) ;
 	char dy = BULLET_SPEED(heading2dxdy[heading].y) ;
-	int x = object_get_x(the_ship.ship_obj) + dx + dx
-					 + GFX2OBJ( (SHIP_TILE_SIZE-3) >> 1 );
-	int y = object_get_y(the_ship.ship_obj) + dy + dy
-					 + GFX2OBJ( (SHIP_TILE_SIZE-3) >> 1 );
+	obj_hdl_t ship_obj = the_ship.ship_obj;
+	int x = object_get_x(ship_obj) + (object_get_size(ship_obj)>>1) + dx ;
+	int y = object_get_y(ship_obj) + (object_get_size(ship_obj)>>1) + dy ;
 	
 	for(i=0; i < MAX_NOF_BULLETS; i++)
 	{
 		if (the_bullets[i].bullet_obj == OBJ_VOID)
 		{
 			the_bullets[i].bullet_obj = 
-				object_create (x, y, dx, dy, OBJ_BULLET);
+				object_create (x, y, dx, dy, BULLET_SIZE);
 			the_bullets[i].age = NEW_BULLET_AGE;
 			nof_bullets++;
 			object_accel(the_ship.ship_obj, -(dx>>5), -(dy>>5));

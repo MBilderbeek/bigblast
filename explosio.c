@@ -1,4 +1,4 @@
-/* $Id: explosio.c,v 1.3 2003/02/15 12:03:56 manuel Exp $
+/* $Id: explosio.c,v 1.4 2003/02/16 15:34:01 eric Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -17,6 +17,10 @@
 /*
  * LOCAL DEFINITIONS
  */
+
+#define EXP_BIG_SIZE  (16 << OBJ_GFX_FACTOR)
+#define EXP_MED_SIZE  (10 << OBJ_GFX_FACTOR)
+#define EXP_SMALL_SIZE (6 << OBJ_GFX_FACTOR)
 
 explosion_t the_explosions[MAX_NOF_EXPLOSIONS];
 char nof_explosions;
@@ -65,13 +69,29 @@ void explosions_move()
 exp_hdl_t explosion_create(int x, int y, expsize_e size, int dx, int dy)
 {
 	exp_hdl_t i;
-
+	int obj_size;
+	
 	for (i=0; i<MAX_NOF_EXPLOSIONS; i++)
 	{
 		if (the_explosions[i].explosion_obj == OBJ_VOID)
 		{
+			switch(size)
+			{
+				case EXP_BIG:
+					obj_size = EXP_BIG_SIZE;
+					break;
+				case EXP_MEDIUM:
+					obj_size = EXP_MED_SIZE;
+					break;
+				case EXP_SMALL:
+					obj_size = EXP_SMALL_SIZE;
+					break;
+				default:
+					obj_size = 0;
+			}
+
 			the_explosions[i].explosion_obj = 
-				object_create (x, y, dx, dy, OBJ_EXP);
+				object_create (x, y, dx, dy, obj_size);
 			the_explosions[i].size = size;
 			the_explosions[i].age = NEW_EXPLOSION_AGE;
 			nof_explosions++;

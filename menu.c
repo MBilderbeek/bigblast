@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.1 2002/12/26 23:54:11 manuel Exp $
+/* $Id: menu.c,v 1.2 2003/02/16 15:34:01 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -9,15 +9,17 @@
 /*
  * INCLUDES
  */
+
+#include "msxbios.h"
 #include "glib.h"
 #include "font.h"
 #include "menu.h"
 #include "controls.h"
-#include "msxbios.h"
 
 /*
  * LOCAL DEFINITIONS
  */
+
 #define MENU_BASE_X 100
 #define MENU_BASE_Y 150 
 #define MENU_ITEM_H (FONT_H+2)

@@ -1,5 +1,5 @@
 CC=htc
-CFLAGS=-O # -DDEBUG_RENDERER
+CFLAGS=-O # -DDEBUG_FPS # -DDEBUG_RENDERER
 TARGET=bigblast
 LIBS=-lg -lf
 EXTRAS=loadgrp.o
@@ -37,6 +37,6 @@ $(TARGET): $(OBJECTS)
 clean:
 	rm -f $(TARGET).com $(OBJECTS) $(TARGET).dsk autoexec.bat
 
-$(TARGET).o: $(TARGET).c 
+$(TARGET).o: $(TARGET).c
 object.o:	object.c object.h
 

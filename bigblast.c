@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.14 2003/02/15 12:03:56 manuel Exp $
+/* $Id: bigblast.c,v 1.15 2003/02/16 15:34:01 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -42,10 +42,10 @@ static char noflives;
 
 static int get_rnd_coord(int range)
 {
-	int netrange = range - GFX2OBJ(SHIP_TILE_SIZE);
+	int netrange = range - object_get_size(the_ship.ship_obj);
 	int coord = rand() %(netrange);
 	if (coord > (netrange >> 1)) 
-		coord += GFX2OBJ(SHIP_TILE_SIZE);
+		coord += object_get_size(the_ship.ship_obj);
 	return(coord);
 }
 
@@ -156,17 +156,17 @@ void play_level(char level)
 		}
 		else
 		{
-			if ((!nof_bullets)&&(!nof_explosions) && (--noflives)) 
+			if ((!nof_bullets)&&(!nof_explosions)&&(--noflives))
 			{
 				ship_init();
 			}
 		}	
-		not_finished=(nof_explosions || nof_bullets || nof_asteroids);
-	
 		asteroids_move();
 		bullets_move();
 		explosions_move();
+
 		quit=check_quit();
+		not_finished=(nof_explosions || nof_bullets || nof_asteroids);
 	}
 	render_info(noflives); // update noflives on screen
 	if (nof_asteroids==0)

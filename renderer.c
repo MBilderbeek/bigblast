@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.18 2003/02/15 12:03:56 manuel Exp $
+/* $Id: renderer.c,v 1.19 2003/02/16 15:34:01 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -24,6 +24,8 @@
 /*
  * LOCAL DEFINITIONS
  */
+
+/* Gfx Coordinates */
 
 #define BOOST_OFFSET 32
 
@@ -121,11 +123,7 @@ void playscreen_init()
 		setplt(i, palette[i]);
 	}
 
-	setpg(GAMEPAGE,BGPAGE);
 	generate_background();
-	boxline(0,0, 255,211-8, 1, PSET);
-	
-	cpyv2v(0,0, 255,211, BGPAGE, 0,0, GAMEPAGE, PSET);
 	
 	setpg(GAMEPAGE,GAMEPAGE);
 	
@@ -142,11 +140,14 @@ void playscreen_init()
 static void generate_background()
 {
 	int i;
+	setpg(GAMEPAGE,BGPAGE);
 	cls();
 	for (i=0; i<100; i++)
 	{
 		pset(rand()%256,rand()%(212-8),rand()%14+2,PSET);
 	}
+	boxline(0,0, 255,211-8, 1, PSET);
+	cpyv2v(0,0, 255,211, BGPAGE, 0,0, GAMEPAGE, PSET);
 }
 	
 
@@ -183,41 +184,41 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	int dx, dy;
 	int dx_prev, dy_prev;
 	int anim_step = (frame_counter % 4);
+	int tilesize;
+	obj_hdl_t ship_obj = the_ship.ship_obj;
 	
-	int x_cur = object_get_x(the_ship.ship_obj);
-	int y_cur = object_get_y(the_ship.ship_obj);
-	int x_prev = object_get_x_prev(the_ship.ship_obj);
-	int y_prev = object_get_y_prev(the_ship.ship_obj);
-	static onoff_t shield_prev;
+	int x_cur = object_get_x(ship_obj);
+	int y_cur = object_get_y(ship_obj);
+	int x_prev = object_get_x_prev(ship_obj);
+	int y_prev = object_get_y_prev(ship_obj);
+	static onoff_t shield_prev=0;
 
-	if (the_ship.shield_energy > 0 && shield == ON)
-		the_ship.shield_energy--; // shouldn't be in the renderer!
-	
 	if ( (x_cur != x_prev) || (y_cur != y_prev) ||
 	     (the_ship.heading != the_ship.heading_prev) ||
-	     (object_get_state(the_ship.ship_obj) == NEW)||
-	     (object_get_state(the_ship.ship_obj) == DYING)||
+	     (object_get_state(ship_obj) == NEW)||
+	     (object_get_state(ship_obj) == DYING)||
 	     shield || shield_prev )
 	{
-		if ( object_get_state(the_ship.ship_obj) == NEW )
-			object_set_state(the_ship.ship_obj, ALIVE);
+		tilesize = OBJ2GFX(object_get_size(ship_obj)) - 1;
+		if ( object_get_state(ship_obj) == NEW )
+			object_set_state(ship_obj, ALIVE);
 		else
 		{
 			dx_prev = OBJ2GFX( x_prev );
 			dy_prev = OBJ2GFX( y_prev );
-			cpyv2v(dx_prev, dy_prev, dx_prev+SHIP_TILE_SIZE-1, 
-				dy_prev+SHIP_TILE_SIZE-1, BGPAGE,
+			cpyv2v(dx_prev, dy_prev,
+			       dx_prev+tilesize, dy_prev+tilesize, BGPAGE,
 			       dx_prev, dy_prev, GAMEPAGE, PSET);
 		}
-		if (object_get_state(the_ship.ship_obj) != DYING)
+		if (object_get_state(ship_obj) != DYING)
 		{
 			dx = OBJ2GFX( x_cur );
 			dy = OBJ2GFX( y_cur );
 			sx = (the_ship.heading & 0x0F) << 4; 
 			sy = the_ship.heading & 0xF0; 
 			if (boost == ON) sy+=BOOST_OFFSET;
-			cpyv2v(sx, sy, sx+SHIP_TILE_SIZE-1, sy+SHIP_TILE_SIZE-1,
-				GFXPAGE, dx, dy, GAMEPAGE, TPSET);
+			cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE,
+			       dx, dy, GAMEPAGE, TPSET);
 			if(shield)
 			{
 				sx = SHIELD_TILE_SIZE * anim_step;
@@ -239,17 +240,17 @@ static void render_asteroids()
 	int dx_prev, dy_prev;
 	int x_cur, y_cur;
 	int x_prev, y_prev;
-	int tilesize;
+	int tilesize, offset;
 	char animstep = frame_counter%4;
 	state_e state;
-	char counter=0;
+	char counter=nof_asteroids;
 	
-	for (i=0; i<MAX_NOF_ASTEROIDS && counter<=nof_asteroids; i++)
+	for (i=0; i<MAX_NOF_ASTEROIDS && counter; i++)
 	{
 		
 		if (the_asteroids[i].size != AST_NONE)
 		{
-			counter++;
+			counter--;
 			x_cur = object_get_x(the_asteroids[i].asteroid_obj);
 			y_cur = object_get_y(the_asteroids[i].asteroid_obj);
 			x_prev = object_get_x_prev(
@@ -260,46 +261,46 @@ static void render_asteroids()
 
 			if ( (x_cur != x_prev) || (y_cur != y_prev) )
 			{
+				tilesize = OBJ2GFX(object_get_size(
+					      the_asteroids[i].asteroid_obj));
+
 				dx_prev = OBJ2GFX( x_prev );
 				dy_prev = OBJ2GFX( y_prev );
-				tilesize = AST_TILE_SIZE;
-				switch (the_asteroids[i].size)
-				{
-					case AST_BIG:
-						sx=AST_SX_BIG;
-						break;
-				 	case AST_MEDIUM:
-						sx=AST_SX_MEDIUM;
-						dx_prev += 3;
-						dy_prev += 3;
-						tilesize -= 5;
-						break;
-					case AST_SMALL:
-						sx=AST_SX_SMALL;
-						dx_prev += 5;
-						dy_prev += 5;
-						tilesize -= 9;
-						break;
-					default:
-						break;
-					}
+
+				tilesize--;
 				cpyv2v(dx_prev, dy_prev, 
-				       dx_prev+tilesize-1, 
-				       dy_prev+tilesize-1, 
-				       BGPAGE, dx_prev, dy_prev, GAMEPAGE,
-				       PSET);
-				state = object_get_state(the_asteroids[i].asteroid_obj);
+				       dx_prev+tilesize, dy_prev+tilesize, 
+				       BGPAGE,
+				       dx_prev, dy_prev, GAMEPAGE, PSET);
+				
+				state = object_get_state(
+					   the_asteroids[i].asteroid_obj);
 				if(state != DYING)
 				{
+					switch (the_asteroids[i].size)
+					{
+						case AST_BIG:
+							sx=AST_SX_BIG;
+							break;
+				 		case AST_MEDIUM:
+							sx=AST_SX_MEDIUM;
+							break;
+						case AST_SMALL:
+							sx=AST_SX_SMALL;
+							break;
+						default:
+							break;
+					}
 					animstep=(animstep+i)%4; // variation
+					offset = (AST_TILE_SIZE - tilesize)>>1;
+					sx += animstep*AST_TILE_SIZE + offset;
 					dx = OBJ2GFX( x_cur );
 					dy = OBJ2GFX( y_cur );
-					cpyv2v(sx+(animstep*AST_TILE_SIZE), 
-						AST_SY, 
-						sx+(animstep+1)*AST_TILE_SIZE-1,
-						AST_SY+AST_TILE_SIZE-1,
-						GFXPAGE, dx, dy, GAMEPAGE,
-						TPSET);
+					offset += AST_SY;
+					cpyv2v(sx, offset, 
+					       sx+tilesize, offset+tilesize,
+					       GFXPAGE,
+					       dx, dy, GAMEPAGE, TPSET);
 				}
 			}
 		}
@@ -314,6 +315,7 @@ static void render_bullets()
 	int dx_prev, dy_prev;
 	int x_cur, y_cur;
 	int x_prev, y_prev;
+	int size;
 	
 	for (i=0; i<MAX_NOF_BULLETS; i++)
 	{
@@ -327,25 +329,25 @@ static void render_bullets()
 					the_bullets[i].bullet_obj);
 			dx_prev = OBJ2GFX( x_prev );
 			dy_prev = OBJ2GFX( y_prev );
+			size = OBJ2GFX(
+				  object_get_size(the_bullets[i].bullet_obj))
+			       - 1;
 
-			cpyv2v(dx_prev, dy_prev, 
-			       dx_prev+BULLET_TILE_SIZE-1, 
-			       dy_prev+BULLET_TILE_SIZE-1, 
+			cpyv2v(dx_prev, dy_prev,
+			       dx_prev+size, dy_prev+size, 
 			       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
 			if (object_get_state(the_bullets[i].bullet_obj)
 					!= DYING)
 			{
 				dx = OBJ2GFX( x_cur );
 				dy = OBJ2GFX( y_cur );
-				boxfill(dx, dy, dx+BULLET_TILE_SIZE-1, 
-					dy+BULLET_TILE_SIZE-1, 
+				boxfill(dx, dy, dx+size, dy+size, 
 					15, PSET); // temporary
-			}
 
-/*			cpyv2v(sx+(BULLET_TILE_SIZE), BULLET_SY, 
-			       sx+BULLET_TILE_SIZE-1, 
-					BULLET_SY+BULLET_TILE_SIZE-1,
-					GFXPAGE, dx, dy, GAMEPAGE, TPSET);*/
+/*				cpyv2v(BULLET_SX, BULLET_SY,
+				       BULLET_SX+size, BULLET_SY+size,
+				       GFXPAGE, dx, dy, GAMEPAGE, TPSET);*/
+			}
 		}
 	}
 }
@@ -358,17 +360,16 @@ static void render_explosions()
 	int dx_prev, dy_prev;
 	int x_cur, y_cur;
 	int x_prev, y_prev;
+	int tilesize, offset;
 	char animstep;
-	int tilesize;
 	state_e state;
-	int offset;
-	char counter=0;
+	char counter=nof_explosions;
 	
-	for (i=0; i<MAX_NOF_EXPLOSIONS && counter<=nof_explosions; i++)
+	for (i=0; i<MAX_NOF_EXPLOSIONS && counter; i++)
 	{
 		if (the_explosions[i].explosion_obj != OBJ_VOID)
 		{
-			counter++;
+			counter--;
 			x_cur = object_get_x(the_explosions[i].explosion_obj);
 			y_cur = object_get_y(the_explosions[i].explosion_obj);
 			x_prev = object_get_x_prev(
@@ -378,47 +379,47 @@ static void render_explosions()
 
 			if ( (x_cur != x_prev) || (y_cur != y_prev) )
 			{
+				tilesize = OBJ2GFX(object_get_size(
+					the_explosions[i].explosion_obj));
+				
 				dx_prev = OBJ2GFX( x_prev );
 				dy_prev = OBJ2GFX( y_prev );
-				tilesize = EXP_TILE_SIZE;
-				switch (the_explosions[i].size)
-				{
-					case EXP_BIG:
-						offset=0;
-						sx=EXP_SX_BIG+offset;
-						break;
-				 	case EXP_MEDIUM:
-						offset=3;
-						sx=EXP_SX_MEDIUM+offset;
-						break;
-					case EXP_SMALL:
-						offset=5;
-						sx=EXP_SX_SMALL+offset;
-						break;
-					default:
-						break;
-				}
-				dx_prev+=offset;
-				dy_prev+=offset;
-				tilesize-=(offset<<1)/*-2*/;
+
+				tilesize--;
 				cpyv2v(dx_prev, dy_prev, 
-				       dx_prev+tilesize, 
-				       dy_prev+tilesize, 
-				       BGPAGE, dx_prev, dy_prev, GAMEPAGE,
-				       PSET);
-				state = object_get_state(the_explosions[i].explosion_obj);
+				       dx_prev+tilesize, dy_prev+tilesize, 
+				       BGPAGE,
+				       dx_prev, dy_prev, GAMEPAGE, PSET);
+
+				state = object_get_state(
+					  the_explosions[i].explosion_obj);
 				if(state != DYING)
 				{
-					dx = OBJ2GFX( x_cur ) + offset;
-					dy = OBJ2GFX( y_cur ) + offset;
-					animstep=NEW_EXPLOSION_AGE-the_explosions[i].age;
-					sx += (animstep*EXP_TILE_SIZE);
-					cpyv2v(sx,
-						EXP_SY+offset,
-					        sx+tilesize,
-						EXP_SY+offset+tilesize,
-						GFXPAGE, dx, dy, GAMEPAGE,
-						TPSET);
+					switch (the_explosions[i].size)
+					{
+						case EXP_BIG:
+							sx = EXP_SX_BIG;
+							break;
+				 		case EXP_MEDIUM:
+							sx = EXP_SX_MEDIUM;
+							break;
+						case EXP_SMALL:
+							sx = EXP_SX_SMALL;
+							break;
+						default:
+							break;
+					}
+					animstep= NEW_EXPLOSION_AGE
+						  - the_explosions[i].age;
+					offset = (EXP_TILE_SIZE - tilesize)>>1;
+					sx += animstep*EXP_TILE_SIZE + offset;
+					dx = OBJ2GFX( x_cur );
+					dy = OBJ2GFX( y_cur );
+					offset += EXP_SY;
+					cpyv2v(sx, offset,
+					       sx+tilesize, offset+tilesize,
+					       GFXPAGE,
+					       dx, dy, GAMEPAGE, TPSET);
 				}
 			}
 		}

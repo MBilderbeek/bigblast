@@ -1,4 +1,4 @@
-/* $Id: object.h,v 1.4 2003/02/07 01:38:46 manuel Exp $
+/* $Id: object.h,v 1.5 2003/02/16 15:34:01 eric Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -14,27 +14,26 @@
  * DEFINITIONS
  */
 
-#define OBJ_MAX_X (4*960)
-#define OBJ_MAX_Y (4*752)
+/* Using a big object space and scale that down for rendering
+ * gives smoother movements
+ */
 
-#define OBJ_MAX_DXY (63)
+#define OBJ_GFX_FACTOR 3
+#define OBJ_MAX_X      (256 << OBJ_GFX_FACTOR)
+#define OBJ_MAX_Y      (204 << OBJ_GFX_FACTOR)
 
-#define OBJ_VOID -1
+#define OBJ2GFX(c)     ((c) >> OBJ_GFX_FACTOR)
+#define GFX2OBJ(c)     ((c) << OBJ_GFX_FACTOR)
+
+#define OBJ_MAX_DXY    31
+
+#define OBJ_VOID       -1
 
 /*
  * TYPE DEFINITIONS
  */
 
 typedef char obj_hdl_t;
-
-typedef enum
-{
-	OBJ_UNUSED,
-	OBJ_SHIP,
-	OBJ_BULLET,
-	OBJ_AST,
-	OBJ_EXP
-} object_e;
 
 typedef enum
 {
@@ -52,7 +51,7 @@ typedef struct
 	int y_prev;
 	char dx;
 	char dy;
-	object_e type;
+	int size;
 	state_e state;
 } object_t;
 
@@ -62,7 +61,7 @@ typedef struct
 
 extern void objects_init (void);
 
-extern obj_hdl_t object_create(int x, int y, char dx, char dy, object_e type);
+extern obj_hdl_t object_create(int x, int y, char dx, char dy, int size);
 
 extern void object_destroy(obj_hdl_t *object);
 
@@ -82,7 +81,7 @@ extern int object_get_dx(obj_hdl_t object);
 
 extern int object_get_dy(obj_hdl_t object);
 
-extern int object_get_type(obj_hdl_t object);
+extern int object_get_size(obj_hdl_t object);
 
 extern state_e object_get_state(obj_hdl_t object);
 
