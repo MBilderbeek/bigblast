@@ -1,7 +1,11 @@
-$Id: ChangeLog,v 1.10 2003/01/03 19:23:52 eric Exp $
+$Id: ChangeLog,v 1.11 2003/01/12 23:04:02 manuel Exp $
+
+2003/01/13 Manuel
+	* Tiny optimizations in the renderer
+	* Changed spelling to right English (momentum!) and small optimization
 
 2003/01/04 Manuel & Eric
-	* Better collision - using 'impulses'
+	* Better collision - using momenta 
 
 2002/12/27 Manuel & Eric
 	* Made preparations to add levels. Already fake levels are working.

@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.7 2003/01/03 18:11:10 eric Exp $
+/* $Id: collisio.c,v 1.8 2003/01/12 23:03:56 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -66,7 +66,6 @@ char ship_hit(onoff_t shield)
 	int ship_y = object_get_y(the_ship.ship_obj); 
 	char ship_dx = object_get_dx(the_ship.ship_obj); 
 	char ship_dy = object_get_dy(the_ship.ship_obj);
-	char impulse;
 	obj_hdl_t ast_obj;
 	astsize_e ast_size;
 	int ast_x, ast_y;
@@ -89,26 +88,18 @@ char ship_hit(onoff_t shield)
 				delta_y = ast_y - ship_y;
 				if (iabs(delta_y) <= delta_dia)
 				{
-					/* calc speed of asteroid with respect to ship (ast's "impulse") */
+					/* calc speed of asteroid with respect to ship (ast's momentum) */
 					delta_x = object_get_dx(ast_obj) - ship_dx;
 					delta_y = object_get_dy(ast_obj) - ship_dy;
 					ast_size = the_asteroids[i].size;
 
-					switch(ast_size)
-					{
-						case AST_SMALL:  impulse = 0; break;
-						case AST_MEDIUM: impulse = 1; break;
-						case AST_BIG:    impulse = 2; break;
-						default:;
-					}
-
-					/* ship gets (part of) ast's "impulse" */
+					/* ship gets (part of) ast's momentum */
 					object_accel(the_ship.ship_obj,
-						     delta_x >> (2 - impulse), delta_y >> (2 - impulse));
+						     delta_x >> (3 - ast_size), delta_y >> (3 - ast_size));
 
-					/* ast loses (part of) its "impulse" */
+					/* ast loses (part of) its momentum */
 					object_accel(ast_obj,
-						     -(delta_x >> impulse), -(delta_y >> impulse));
+						     -(delta_x >> ast_size), -(delta_y >> ast_size));
 
 					ship_dx = object_get_dx(the_ship.ship_obj); 
 					ship_dy = object_get_dy(the_ship.ship_obj); 
