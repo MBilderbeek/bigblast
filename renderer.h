@@ -1,4 +1,4 @@
-/* $Id: renderer.h,v 1.9 2004/01/27 22:26:47 manuel Exp $
+/* $Id: renderer.h,v 1.10 2004/08/22 20:01:27 eric Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -13,6 +13,7 @@
  * INCLUDES
  */
 
+#include <glib.h>
 #include "ship.h"
 
 /*
@@ -30,11 +31,15 @@
 extern unsigned int frame_counter;
 
 void render_init();
-void dedbuffer();
 void menuscreen_init();
 void playscreen_init();
 void render_frame(onoff_t boost, onoff_t shield, char noflives);
 void render_info(char noflives);
+
+// double buffering
+#define db_start() setpg(0,1)
+#define db_stop()  setpg(0,0)
+#define db_swap()  setpg(c_apage,c_dpage)
 
 #endif
 

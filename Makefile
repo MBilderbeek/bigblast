@@ -7,11 +7,11 @@
 	$(CC) -c $(CFLAGS) $<
 
 CC=htc
-CFLAGS=-O -DUSE_FUNCTIONS # -DDEBUG_FPS # -DDEBUG_RENDERER
+CFLAGS=-O # -DUSE_FUNCTIONS # -DDEBUG_FPS # -DDEBUG_RENDERER
 TARGET=bigblast
 LIBS=-lg -lf
 EXTRAS=
-OTHERFILES=./disk/ships.sr5 ./disk/ships.pl5
+OTHERFILES=./disk/ships.sr5 ./disk/ships.pl5 ./disk/intro.sr5 ./disk/intro.pl5
 DOSFILEPATH=./disk/
 EMULATOR=openmsx 
 EMUDISK=-diska

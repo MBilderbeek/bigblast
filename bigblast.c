@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.26 2004/01/27 22:26:47 manuel Exp $
+/* $Id: bigblast.c,v 1.27 2004/08/22 20:01:26 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -43,23 +43,14 @@ unsigned char level;
 static char quit=0;
 static char noflives;
 
-static int get_rnd_coord(int range)
-{
-	int netrange = range - object_get_size(the_ship.ship_obj);
-	int coord = rand() %(netrange);
-	if (coord > (netrange >> 1)) 
-		coord += object_get_size(the_ship.ship_obj);
-	return(coord);
-}
-
 static void get_rnd_border_coord(int *x, int *y)
 {
 	switch(rand()&0x03)
 	{
 		case 0: *x=0; *y=rand()%OBJ_MAX_Y; break;
-		case 1: *y=0; *x=rand()%OBJ_MAX_Y; break;
+		case 1: *y=0; *x=rand()%OBJ_MAX_X; break;
 		case 2: *x=OBJ_MAX_X-1; *y=rand()%OBJ_MAX_Y; break;
-		case 3: *y=OBJ_MAX_Y-1; *x=rand()%OBJ_MAX_Y; break;
+		case 3: *y=OBJ_MAX_Y-1; *x=rand()%OBJ_MAX_X; break;
 		default: /*kernel panic!*/ break;
 	}
 }
@@ -202,7 +193,7 @@ void play_level(char level)
 	if ((nof_asteroids-nof_steel_asteroids)==0)
 	{
 		add_bonus(level, noflives);
-		dedbuffer();
+		db_stop();
 		sprintf(string,"Wave %d completed!",level);
 		write_cent(string, MSG_BASE);
 		*JIFFY = 0;
@@ -227,7 +218,7 @@ void play_game()
 	if (noflives==0) // This means that !quit==TRUE implicitly
 	{
 		int ypos=MSG_BASE;
-		dedbuffer();
+		db_stop();
 		if (nof_asteroids-nof_steel_asteroids==0) ypos-=20;
 		
 		sprintf(string,"Game over!");
@@ -264,12 +255,12 @@ void main ()
 
 	do
 	{
+		wrtvdp(1,32); // Disable Screen
 		menuscreen_init();
-		sprintf(string,"Welcome to Big Blast!");
-		write_cent(string, MSG_BASE);
 		sprintf(string,"High Score: %05d", hiscore);
-		write_cent(string, 212-10);
+		write_cent(string, 212-8);
 		init_menu();
+		wrtvdp(1,96); // Enable Screen
 		while (keypressed());
 		if (!rndinit) 
 		{

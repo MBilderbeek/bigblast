@@ -1,4 +1,4 @@
-/* $Id: menu.c,v 1.3 2003/03/20 23:47:31 manuel Exp $
+/* $Id: menu.c,v 1.4 2004/08/22 20:01:26 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -20,58 +20,31 @@
  * LOCAL DEFINITIONS
  */
 
-#define MENU_BASE_X (128-(FONT_W*2))
-#define MENU_BASE_Y 150 
-#define MENU_ITEM_H (FONT_H+2)
+#define MENU_BASE_X 104
+#define MENU_BASE_Y 162 
+#define MENU_ITEM_H 13
+#define MENU_ITEM_W 46 
+#define MENU_ITEM_DIST 7 
 
 #define NOF_ITEMS 2
 
 #define C_CURSOR 15
 
-static int palette[] = 
-{	/*-GRB*/
-	0x0000,
-	0x0111, /* 1: black    */
-	0x0777, /* 2:          */
-	0x0404, /* 3:          */
-	0x0202, /* 4:          */
-	0x0333, /* 5:          */
-	0x0070, /* 6:          */
-	0x0527, /* 7:          */
-	0x0527, /* 8:          */
-	0x0572, /* 9:          */
-	0x0333, /*10:          */
-	0x0333, /*11:          */
-	0x0333, /*12:          */
-	0x0333, /*13:          */
-	0x0117, /*14:          */
-	0x0777  /*15: cursor   */
-};
+extern int gs2loadgrp(char *,  uchar);
+extern int gs2loadpal(char *, int *);
 
 void draw_cursor(menu_item_e curpos)
 {
-	boxfill(MENU_BASE_X-1, MENU_BASE_Y - 1 + curpos*MENU_ITEM_H,
-		MENU_BASE_X+1 + 4*FONT_W - 1, 
-		MENU_BASE_Y+1 + FONT_H - 1 + curpos*MENU_ITEM_H,
+	boxfill(MENU_BASE_X-1, 
+			MENU_BASE_Y-1 + curpos*(MENU_ITEM_H+MENU_ITEM_DIST),
+		MENU_BASE_X+1 + MENU_ITEM_W, 
+		MENU_BASE_Y+1 + MENU_ITEM_H + 
+					curpos*(MENU_ITEM_H+MENU_ITEM_DIST),
 		C_CURSOR,XOR);
 }
 
 void init_menu()
 {
-	uchar i;
-	char string[100];
-	for(i=0; i<16;i++)
-	{
-		setplt(i, palette[i]);
-	}
-
-	// print the menu options
-	sprintf(string,"Play");
-	write(string, MENU_BASE_X, MENU_BASE_Y);
-	sprintf(string,"Quit");
-	write(string, MENU_BASE_X, MENU_BASE_Y+10);
-	
-	// draw cursor for first item
 	draw_cursor(PLAY);
 }
 

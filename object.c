@@ -1,4 +1,4 @@
-/* $Id: object.c,v 1.7 2004/01/27 22:26:47 manuel Exp $
+/* $Id: object.c,v 1.8 2004/08/22 20:01:26 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -164,7 +164,7 @@ void object_set_state(obj_hdl_t object, state_e state)
 void object_move(obj_hdl_t object)
 {
 	object_t *the_object = &(objects[object]);
-	int temp; // wat een kutcompiler zeg!
+	int temp;
 	int limit;
 
 	the_object->x_prev[c_dpage] = the_object->x;
@@ -172,14 +172,14 @@ void object_move(obj_hdl_t object)
 	
 	limit = OBJ_MAX_X - the_object->size;
 	temp = the_object->x + the_object->dx;
-	if ( temp < 0 ) temp += limit;
-	if ( temp >= limit ) temp -= limit;
+	if      ( temp < 0 )      temp += limit;
+	else if ( temp >= limit ) temp -= limit;
 	the_object->x = temp;
 
 	limit = OBJ_MAX_Y - the_object->size;
 	temp = the_object->y + the_object->dy;
-	if ( temp < 0 ) temp += limit;
-	if ( temp >= limit ) temp -= limit;
+	if      ( temp < 0 ) temp += limit;
+	else if ( temp >= limit ) temp -= limit;
 	the_object->y = temp;
 }
 
@@ -209,7 +209,8 @@ char mysqrt(int n)
 	int r, rn=n>>1;
 
 	do
-	{	r=rn;
+	{
+		r=rn;
 		rn=(r + n/r)>>1;
 	}
 	while ((r-rn)>1);

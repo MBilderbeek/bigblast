@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.29 2004/01/28 21:44:50 manuel Exp $
+$Id: ChangeLog,v 1.30 2004/08/22 20:01:26 eric Exp $
+
+2004/02/02 Eric
+	* Added 'non-function' versions of object access in object.h
+	* Removed obsolete code in bigblast.c
 
 2004/01/28 Manuel
 	* Split rendering and unrendering of objects
@@ -6,6 +10,9 @@ $Id: ChangeLog,v 1.29 2004/01/28 21:44:50 manuel Exp $
 
 2004/01/27 Manuel
 	* Added initial double buffering (see TODO)
+
+2004/01/26 Eric
+	* Improved gs2loadgrp(). Now with palette loading. Woei!
 
 2003/05/30 Manuel & Eric
 	* Added a homing tinkeroid! Watch it, buddy! Search and destroy...

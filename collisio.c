@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.19 2003/05/29 21:56:46 manuel Exp $
+/* $Id: collisio.c,v 1.20 2004/08/22 20:01:26 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -24,15 +24,17 @@
  */
 
 //#define AST_SHIP_SLACK GFX2OBJ(4) -> move to ship size
-
+#define iabs(x) ((x)>0?(x): -(x))
 /*
  * EXTERNAL FUNCTIONS
  */
 
+#if 0
 static int iabs(int i)
 {
 	return (i > 0)? i: -i;
 }
+#endif
 
 static int get_center_x(obj_hdl_t obj)
 {
@@ -46,16 +48,15 @@ static int get_center_y(obj_hdl_t obj)
 
 static char objects_hit(obj_hdl_t obj1, obj_hdl_t obj2) // object_shit?
 {
-	int x1 = get_center_x(obj1);
 	int dist = (object_get_size(obj1)+object_get_size(obj2)) >> 1; //=dia1+dia2
-	int x2 = get_center_x(obj2);
+	int x = get_center_x(obj1)-get_center_x(obj2);
+	
 	char result=0;
 
-	if (iabs(x2-x1) <= dist)
+	if (iabs(x) <= dist)
 	{
-		int y1 = get_center_y(obj1);
-		int y2 = get_center_y(obj2);
-		if (iabs(y2-y1) <= dist) result=1;
+		int y = get_center_y(obj1)-get_center_y(obj2);
+		if (iabs(y) <= dist) result=1;
 	}
 	return result;
 }

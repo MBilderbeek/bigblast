@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.29 2004/01/28 21:44:50 manuel Exp $
+/* $Id: renderer.c,v 1.30 2004/08/22 20:01:27 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -71,7 +71,8 @@
 #define	C_SHIELD_O_METER 14
 #define	C_WHITE 15
 
-static int palette[128];
+static int palette_game[128];
+static int palette_menu[128];
 
 static void render_ship(onoff_t boost, onoff_t shield);
 static void unrender_ship();
@@ -85,7 +86,7 @@ static void render_bullets();
 static void unrender_bullets();
 static void generate_background();
 
-int *Timer=(int *)0xFC9E;                                /*Systeemtimer*/
+#define JIFFY (*((int *)0xFC9E))
 
 unsigned int frame_counter;
 
@@ -111,23 +112,23 @@ void render_init()
 	
 	
 	(void) gs2loadgrp("ships.sr5", GFXPAGE);
-	(void) gs2loadpal("ships.pl5", palette);
+	(void) gs2loadpal("ships.pl5", palette_game);
 	
-	*Timer=0;
-}
-
-void dedbuffer() // de-double-buffer
-{
-	setpg (c_apage,c_apage);
+	JIFFY = 0;
 }
 
 void menuscreen_init()
 {
 	setpg(0,0);
+	db_stop();
 	boxfill(0,0, 255,211, 0, PSET); // wipe screen
 	setpg(0,1);
 	boxfill(0,0, 255,211, 0, PSET); // wipe screen
 	setpg(0,0);
+	(void) gs2loadgrp("intro.sr5", 0);
+	(void) gs2loadpal("intro.pl5", palette_menu);
+			// we could also just load it once,i
+			// but it takes so little time that it isn't worth it
 }
 
 void playscreen_init()
@@ -135,15 +136,14 @@ void playscreen_init()
 	uchar i;
 	for(i=0; i<16;i++)
 	{
-		setplt(i, palette[i]);
+		setplt(i, palette_game[i]);
 	}
 	
+	db_start();
 	boxfill(0,0, 255,211, 0, PSET); // wipe screen
-	setpg(c_apage,c_dpage);
+	db_swap();
 	boxfill(0,0, 255,211, 0, PSET); // wipe screen
 
-	setpg(1-GAMEPAGE,GAMEPAGE);
-	
 	generate_background();
 	
 	write("Score:", SCORE_X, SCORE_Y);
@@ -153,7 +153,7 @@ void playscreen_init()
 		 SHIELD_O_METER_X+63+1,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
 		 C_WHITE, PSET);
 
-	cpyv2v(0,0,255,211,GAMEPAGE,0,0,1-GAMEPAGE,PSET);
+	cpyv2v(0,0,255,211,c_apage,0,0,c_dpage,PSET);
 	
 	setpg(GAMEPAGE,1-GAMEPAGE);
 }
@@ -169,7 +169,7 @@ static void generate_background()
 		pset(rand()%256,rand()%(212-8),rand()%14+2,PSET);
 	}
 	boxline(0,0, 255,211-8, 1, PSET);
-	cpyv2v(0,0, 255,211, BGPAGE, 0,0, GAMEPAGE, PSET);
+	cpyv2v(0,0, 255,211, BGPAGE, 0,0, p, PSET);
 	setpg(c_dpage,p);
 }
 	
@@ -178,7 +178,7 @@ void render_frame(onoff_t boost, onoff_t shield, char noflives)
 {
 #ifdef DEBUG_FPS
 	line(0,0,25,0,1,PSET);
-	line(0,0,*Timer,0,15,PSET);
+	line(0,0,JIFFY,0,15,PSET);
 	pset(4,1,8,PSET);
 	pset(9,1,8,PSET);
 #endif
@@ -191,10 +191,9 @@ void render_frame(onoff_t boost, onoff_t shield, char noflives)
 		}
 	}
 #endif
-	while (*Timer<6);
-	*Timer=0;
-	setpg(c_apage,c_dpage);
-//	cpyv2v(0,0, 255,SCORE_Y-1, BGPAGE, 0,0, c_apage , PSET); // naieve double buffering: erase the whole page!
+	while (JIFFY<6);
+	JIFFY=0;
+	db_swap();
 
 	if (the_ship.ship_obj!=OBJ_VOID) unrender_ship();
 	frame_counter++;
@@ -369,10 +368,7 @@ static void render_bullet_obj(obj_hdl_t bullet_obj)
 		int dy = OBJ2GFX( object_get_y(bullet_obj) );
 		int size = OBJ2GFX(object_get_size(bullet_obj)) - 1;
 
-		boxfill(dx, dy, dx+size, dy+size, 15, PSET); // temporary
-
-/*		cpyv2v(BULLET_SX, BULLET_SY, BULLET_SX+size, BULLET_SY+size,
-				       GFXPAGE, dx, dy, c_apage, TPSET);*/
+		boxfill(dx, dy, dx+size, dy+size, 15, PSET);
 	}
 }
 
