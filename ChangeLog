@@ -1,10 +1,14 @@
-$Id: ChangeLog,v 1.1 2002/09/27 17:27:26 manuel Exp $
+$Id: ChangeLog,v 1.2 2002/10/31 23:45:19 manuel Exp $
 
-$Log: ChangeLog,v $
-Revision 1.1  2002/09/27 17:27:26  manuel
-Several improvements:
-- Less bullets (6)
-- Less bullet lifetime (12)
-- Only one bullet per shot
-- Fixed start speed of asteroids (faster now)
+2002/11/01 Manuel & Eric
+	* Fixed bug in redraw of dying ship in renderer.c
+	* Generate background with random numbers instead of loading
+	* End of game message with kilbuf
+
+2002/09/27 Manuel Bilderbeek <manuel@msxnet.org>
+	* Several improvements:
+	  - Less bullets (6)
+	  - Less bullet lifetime (12)
+	  - Only one bullet per shot
+	  - Fixed start speed of asteroids (faster now)
 

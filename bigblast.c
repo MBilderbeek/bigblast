@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.5 2002/10/17 22:09:23 manuel Exp $
+/* $Id: bigblast.c,v 1.6 2002/10/31 23:45:19 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -91,4 +91,13 @@ void main ()
 
 	screen(0);
 	*CLICKSW=clicksw_old;
+	kilbuf();
+	if (nof_asteroids==0)
+	{
+		printf("You won! Good man!\n");
+	}
+	else if (noflives==0)
+	{
+		printf("Game over! You lost! (Sucker!)\n");
+	}
 }

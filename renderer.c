@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.6 2002/10/12 22:18:56 eric Exp $
+/* $Id: renderer.c,v 1.7 2002/10/31 23:45:19 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -10,6 +10,7 @@
  * INCLUDES
  */
 
+#include "stdlib.h"
 #include "glib.h"
 #include "ship.h"
 #include "asteroid.h"
@@ -25,10 +26,10 @@ static int palette[] =
 	0x0404, /* 3: shield 2 */
 	0x0202, /* 4: shield 3 */
 	0x0333, /* 5:          */
-	0x0527, /* 6:          */
+	0x0070, /* 6:          */
 	0x0527, /* 7:          */
 	0x0527, /* 8:          */
-	0x0527, /* 9:          */
+	0x0572, /* 9:          */
 	0x0333, /*10:          */
 	0x0333, /*11:          */
 	0x0333, /*12:          */
@@ -56,6 +57,7 @@ extern void loadgrp(char *filename, unsigned int x, unsigned char y, char page);
 static void render_ship(onoff_t boost, onoff_t shield);
 static void render_asteroids();
 static void render_bullets();
+static void generate_background();
 
 int *Timer=(int *)0xFC9E;                                /*Systeemtimer*/
 
@@ -85,14 +87,23 @@ void render_init()
 	}
 	strcpy(filename,"\"SHIPS.COP\""); 
 	loadgrp(filename, 0, 0, GFXPAGE);
-	strcpy(filename, "\"BACKG.COP\"");
-	loadgrp(filename, 0, 0, BGPAGE);
 	setpg(0,BGPAGE);
+	generate_background();
 	boxline(0,0, 255,211, 1, PSET);
 	setpg(0,0);
 
 	cpyv2v(0,0, 255,211, BGPAGE, 0,0, 0, PSET);
 }
+
+static void generate_background()
+{
+	int i;
+	for (i=0; i<100; i++)
+	{
+		pset(rand()%256,rand()%212,rand()%14+2,PSET);
+	}
+}
+	
 
 void render_frame(onoff_t boost, onoff_t shield)
 {
@@ -140,6 +151,7 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	if ( (x_cur != x_prev) || (y_cur != y_prev) ||
 	     (the_ship.heading != the_ship.heading_prev) ||
 	     (object_get_state(the_ship.ship_obj) == NEW)||
+	     (object_get_state(the_ship.ship_obj) == DYING)||
 	     shield || shield_prev )
 	{
 		if ( object_get_state(the_ship.ship_obj) == NEW )
