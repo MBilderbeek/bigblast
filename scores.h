@@ -1,4 +1,4 @@
-/* $\Id$
+/* $Id: scores.h,v 1.2 2002/11/09 00:26:31 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *

@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.4 2002/10/12 22:18:56 eric Exp $
+/* $Id: collisio.c,v 1.5 2002/11/09 00:22:58 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -16,6 +16,7 @@
 #include "asteroid.h"
 #include "bullet.h"
 #include "renderer.h"
+#include "scores.h"
 
 /*
  * LOCAL DEFINITIONS
@@ -125,6 +126,13 @@ void bullets_n_asteroids()
 			switch(ast_state)
 			{
 			case DYING:
+				switch (the_asteroids[i].size)
+				{
+				case AST_SMALL: score+=SC_AST_SMALL; break;
+				case AST_MEDIUM: score+=SC_AST_MEDIUM; break;
+				case AST_BIG: score+=SC_AST_BIG; break;
+				default: ;
+				}
 				asteroid_destroy(i);
 				break;
 			case ALIVE:

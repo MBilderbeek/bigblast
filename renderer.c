@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.8 2002/11/01 17:57:18 eric Exp $
+/* $Id: renderer.c,v 1.9 2002/11/09 00:22:58 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -18,6 +18,32 @@
 #include "renderer.h"
 #include "object.h"
 
+/*
+ * LOCAL DEFINITIONS
+ */
+
+#define BOOST_OFFSET 32
+
+#define AST_SX_BIG 0
+#define AST_SX_MEDIUM (4*AST_TILE_SIZE)
+#define AST_SX_SMALL (8*AST_TILE_SIZE)
+#define AST_SY (4*SHIP_TILE_SIZE)
+#define SHIELD_SY (AST_SY + 16)
+#define GFXPAGE 2
+#define BGPAGE  3
+
+#define SHIELD_O_METER_H 5
+#define SHIELD_O_METER_Y (212-SHIELD_O_METER_H)
+#define SHIELD_O_METER_X ((256-64)>>1)
+
+#define	C_TRANSP 0
+#define C_BLACK 1
+#define	C_SHIELD1 2
+#define	C_SHIELD2 3
+#define	C_SHIELD3 4
+#define	C_SHIELD_O_METER 14
+#define	C_WHITE 15
+
 static int palette[] = 
 {	/*-GRB*/
 	0x0000,
@@ -34,34 +60,21 @@ static int palette[] =
 	0x0333, /*11:          */
 	0x0333, /*12:          */
 	0x0333, /*13:          */
-	0x0333, /*14:          */
+	0x0117, /*14:          */
 	0x0777  /*15:          */
 };
 
 extern void loadgrp(char *filename, unsigned int x, unsigned char y, char page);
 
-/*
- * LOCAL DEFINITIONS
- */
-
-#define BOOST_OFFSET 32
-
-#define AST_SX_BIG 0
-#define AST_SX_MEDIUM (4*AST_TILE_SIZE)
-#define AST_SX_SMALL (8*AST_TILE_SIZE)
-#define AST_SY (4*SHIP_TILE_SIZE)
-#define SHIELD_SY (AST_SY + 16)
-#define GFXPAGE 2
-#define BGPAGE  3
-
 static void render_ship(onoff_t boost, onoff_t shield);
 static void render_asteroids();
 static void render_bullets();
 static void generate_background();
+static void render_info();
 
 int *Timer=(int *)0xFC9E;                                /*Systeemtimer*/
 
-unsigned int frame_counter = 0;
+unsigned int frame_counter;
 
 /*
  * EXTERNAL FUNCTIONS
@@ -98,6 +111,7 @@ void render_init()
 static void generate_background()
 {
 	int i;
+	cls();
 	for (i=0; i<100; i++)
 	{
 		pset(rand()%256,rand()%212,rand()%14+2,PSET);
@@ -113,6 +127,7 @@ void render_frame(onoff_t boost, onoff_t shield)
 	render_ship(boost, shield);
 	render_asteroids();
 	render_bullets();
+	render_info();
 #ifdef DEBUG_RENDERER
 	{
 		int i;
@@ -275,3 +290,20 @@ static void render_bullets()
 	}
 }
 
+static void render_info()
+{
+	char shield_stat = the_ship.shield_energy >> 2;
+	
+	boxline (SHIELD_O_METER_X,SHIELD_O_METER_Y, 
+		 SHIELD_O_METER_X+63+2,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
+		 C_WHITE, PSET);
+	if (shield_stat>0)
+		boxfill (SHIELD_O_METER_X+1,SHIELD_O_METER_Y+1,
+			SHIELD_O_METER_X+shield_stat,
+			SHIELD_O_METER_Y+SHIELD_O_METER_H-2, 
+			C_SHIELD_O_METER, PSET);
+	if (shield_stat<63)
+		boxfill (SHIELD_O_METER_X+shield_stat+1,SHIELD_O_METER_Y+1, 
+			SHIELD_O_METER_X+64-2,
+			SHIELD_O_METER_Y+SHIELD_O_METER_H-2, C_BLACK, PSET);
+}
