@@ -2,9 +2,59 @@
   - schermovergangen beetje fixen
   - include glib.h weghalen bij object.h
 - snelheid UFO bullet mag wel wat uniformer of anderszins verbeterd
-- optimalisatie: hou aantal astroids/kogels/explosies bij zodat als je ze
-  allemaal gehad hebt je niet meer hoeft te zoeken -> implementeren voor
-  kogels?
+- optimalisatie opties: 
+  - hou aantal astroids/kogels/explosies bij zodat als je ze allemaal gehad
+    hebt je niet meer hoeft te zoeken -> implementeren voor kogels?
+  - collisio: sla de 'center' coordinaten op en doe het uncenteren alleen in de renderer, i.p.v. de hele tijd in de collisio
+  - objects_hit misschien toch 'inlinen'?
+  - kleine objecten als sprites maken (bullets): kleine copy's zijn veel langzamer dan grote, zie MAP, de bullets 'plotten' in VRAM schijnt ook veel sneller te zijn dan copieren. 
+  - snelle nepwortel:
+ Dist:   ld      a,b
+         cp      c
+         jr      c,.Cbig
+         srl     c               ; c / 4
+         srl     c
+         add     a,c             ; a = b + c
+         ret
+ .Cbig:  srl     a               ; b / 4
+         srl     a
+         add     a,c             ; a = b + c
+         ret
+ that's a = sqr(b^2+c^2), approximated by a = max(b,c) + min(b,c) / 4
+ use this for collision detector?
+ andere optie: MCCM 76, pagina 9
+ En nog een snelle van Arjan:
+ <Arjan> ROOT:   XOR   A
+<Arjan>         LD    H,A
+<Arjan>         LD    L,A
+<Arjan>         LD    D,A
+<Arjan>         LD    E,A
+<Arjan>         INC   A
+<Grauw> makes it a bit different to compare to NOP's :)
+<Arjan> ROOTLO: SLA   C
+<Arjan>         RL    B
+<Arjan>         ADC   HL,HL
+<Arjan>         SLA   C
+<Arjan>         RL    B
+<Arjan>         ADC   HL,HL
+<Arjan>         SCF
+<Arjan>         RL    E
+<Arjan>         SBC   HL,DE
+<Arjan>         JR    NC,SHIFT1
+<Arjan> SHIFT:  ADD   HL,DE
+<Arjan>         DEC   E
+<Arjan>         SLA   A
+<Arjan>         JR    NC,ROOTLO
+<Arjan>         RET
+<Arjan> SHIFT1: INC   E
+<Arjan>         RLA
+<Arjan>         INC   A
+<Arjan>         JR    NC,ROOTLO
+<Arjan>         RET
+<Arjan> input in BC
+<Arjan> output in A
+Geoptimaliseerde versie van die uit MCCM.
+-
 - echtere levels
 - andere vijanden
 - nova's: alles wit maken en langzaam terugfaden

@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.30 2004/08/22 20:01:27 eric Exp $
+/* $Id: renderer.c,v 1.31 2004/12/03 23:04:48 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -127,7 +127,7 @@ void menuscreen_init()
 	setpg(0,0);
 	(void) gs2loadgrp("intro.sr5", 0);
 	(void) gs2loadpal("intro.pl5", palette_menu);
-			// we could also just load it once,i
+			// we could also just load it once,
 			// but it takes so little time that it isn't worth it
 }
 

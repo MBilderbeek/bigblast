@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.27 2004/08/22 20:01:26 eric Exp $
+/* $Id: bigblast.c,v 1.28 2004/12/03 23:04:48 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -42,6 +42,16 @@ unsigned int hiscore=0;
 unsigned char level;
 static char quit=0;
 static char noflives;
+
+/*
+static int get_rnd_coord(int range)
+{
+	int netrange = range - object_get_size(the_ship.ship_obj);
+	int coord = rand() %(netrange);
+	if (coord > (netrange >> 1)) 
+		coord += object_get_size(the_ship.ship_obj);
+	return(coord);
+}*/
 
 static void get_rnd_border_coord(int *x, int *y)
 {
