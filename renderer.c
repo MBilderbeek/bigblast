@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.3 2002/09/29 22:44:51 eric Exp $
+/* $Id: renderer.c,v 1.4 2002/10/05 20:31:45 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -110,6 +110,7 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	int y_cur = object_get_y(the_ship.ship_obj);
 	int x_prev = object_get_x_prev(the_ship.ship_obj);
 	int y_prev = object_get_y_prev(the_ship.ship_obj);
+	static onoff_t shield_prev;
 	
 	sx = (the_ship.heading & 0x0F) << 4; 
 	sy = the_ship.heading & 0xF0; 
@@ -124,7 +125,8 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	
 	if ( (x_cur != x_prev) || (y_cur != y_prev) ||
 	     (the_ship.heading != the_ship.heading_prev) ||
-	     (object_get_state(the_ship.ship_obj) == NEW) )
+	     (object_get_state(the_ship.ship_obj) == NEW)||
+	     shield != shield_prev)
 	{
 		if ( object_get_state(the_ship.ship_obj) == NEW )
 			object_set_state(the_ship.ship_obj, ALIVE);
@@ -144,6 +146,7 @@ static void render_ship(onoff_t boost, onoff_t shield)
 				       GFXPAGE, dx, dy, 0, TPSET);
 			}
 		}
+		shield_prev = shield;
 	}
 }
 	

@@ -1,4 +1,4 @@
-/* $Id: controls.c,v 1.3 2002/09/29 22:44:51 eric Exp $
+/* $Id: controls.c,v 1.4 2002/10/05 20:31:45 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -18,12 +18,16 @@
  * DEFINES
  */
 
-#define ESC 27
-#define SHIELDKEY ((int)'m')
+#define NEWKEY 0xFBE5
+
+#define CHECK_KEYBMX(row, col)  !(*((char *)(NEWKEY + row)) & (1<<col))
+
+#define ESC_PRESSED CHECK_KEYBMX(7,2)
+#define SHIFT_PRESSED CHECK_KEYBMX(6,0)
+
 void check_quit(char *quit)
 {
-	if (kbhit())
-		*quit=(getch()==ESC);
+	*quit=ESC_PRESSED;
 }
 
 void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *fire)
@@ -54,6 +58,5 @@ void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *
 	}
 	else 
 		*fire = OFF;
-	if(kbhit())
-		*shield=((getch()|32) == SHIELDKEY);
+	*shield=SHIFT_PRESSED;
 }

@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: collisio.c,v 1.3 2002/10/05 20:31:45 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -55,7 +55,7 @@ static int get_ast_dia(ast_hdl_t i)
 	return ast_dia;
 }
 
-char ship_hit(obj_hdl_t *object)
+char ship_hit(onoff_t shield)
 {
 	char i, hit=0;
 	int ship_x = object_get_x(the_ship.ship_obj); 
@@ -83,13 +83,17 @@ char ship_hit(obj_hdl_t *object)
 				delta_y = ABS(delta_y); // see above
 			
 				if (delta_y <= delta_dia)
-					hit = 1;
+				{
+					object_set_state(the_asteroids[i].asteroid_obj, DYING);
+					if (!shield) hit = 1;
+				}
 			}
 		}
 
 	}
-	*object = the_asteroids[--i].asteroid_obj; 
-	if (hit) object_set_state(the_ship.ship_obj,DYING); // side effect
+	if (hit && !shield){
+		object_set_state(the_ship.ship_obj,DYING); // side effect
+	}
 	return (hit);
 }
 

@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.3 2002/09/29 22:44:51 eric Exp $
+/* $Id: bigblast.c,v 1.4 2002/10/05 20:31:45 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -81,7 +81,7 @@ void main ()
 			boost=OFF;
 			ship_init();
 		}
-		if (ship_hit(&dummy))
+		if (ship_hit(shield))
 		{
 			beep(); // explosion function should be here
 			noflives--;
