@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: bigblast.c,v 1.3 2002/09/29 22:44:51 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -66,7 +66,7 @@ void main ()
 	
 	while (!quit && noflives!=0)
 	{
-		render_frame(boost);
+		render_frame(boost, shield);
 		check_controls(&rotdir, &boost, &shield, &fire);
 		ship_rotate(rotdir);
 		if (boost==ON) ship_accel();

@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: renderer.c,v 1.3 2002/09/29 22:44:51 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -17,6 +17,26 @@
 #include "renderer.h"
 #include "object.h"
 
+static int palette[] = 
+{	/*-GRB*/
+	0x0000,
+	0x0111, /* 1: black    */
+	0x0077, /* 2: shield 1 */
+	0x0044, /* 3: shield 2 */
+	0x0022, /* 4: shield 3 */
+	0x0333, /* 5:          */
+	0x0527, /* 6:          */
+	0x0527, /* 7:          */
+	0x0527, /* 8:          */
+	0x0527, /* 9:          */
+	0x0333, /*10:          */
+	0x0333, /*11:          */
+	0x0333, /*12:          */
+	0x0333, /*13:          */
+	0x0333, /*14:          */
+	0x0777  /*15:          */
+};
+
 extern void loadgrp(char *filename, unsigned int x, unsigned char y, char page);
 
 /*
@@ -29,10 +49,10 @@ extern void loadgrp(char *filename, unsigned int x, unsigned char y, char page);
 #define AST_SX_MEDIUM (4*AST_TILE_SIZE)
 #define AST_SX_SMALL (8*AST_TILE_SIZE)
 #define AST_SY (4*SHIP_TILE_SIZE)
-
+#define SHIELD_SY (AST_SY + 16)
 #define GFXPAGE 2
 
-static void render_ship(onoff_t boost);
+static void render_ship(onoff_t boost, onoff_t shield);
 static void render_asteroids();
 static void render_bullets();
 
@@ -46,21 +66,26 @@ unsigned int frame_counter = 0;
 
 void render_init()
 {
+	uchar i;
 	char filename[16];
 	
 	ginit();
 	color(15,0,0);
 	screen(5);
+	for(i=0; i<16;i++)
+	{
+		setplt(i, palette[i]);
+	}
 	strcpy(filename,"\"SHIPS.COP\""); 
 	loadgrp(filename, 0, 0, GFXPAGE);
 }
 
-void render_frame(onoff_t boost)
+void render_frame(onoff_t boost, onoff_t shield)
 {
 	while (*Timer<5);
 	*Timer=0;
 	frame_counter++;
-	render_ship(boost);
+	render_ship(boost, shield);
 	render_asteroids();
 	render_bullets();
 #ifdef DEBUG_RENDERER
@@ -74,11 +99,12 @@ void render_frame(onoff_t boost)
 #endif
 }
 
-static void render_ship(onoff_t boost)
+static void render_ship(onoff_t boost, onoff_t shield)
 {
 	int sx, sy;
 	int dx, dy;
 	int dx_prev, dy_prev;
+	int anim_step = (frame_counter % 4);
 	
 	int x_cur = object_get_x(the_ship.ship_obj);
 	int y_cur = object_get_y(the_ship.ship_obj);
@@ -106,8 +132,18 @@ static void render_ship(onoff_t boost)
 			boxfill(dx_prev, dy_prev, dx_prev+SHIP_TILE_SIZE-1, 
 				dy_prev+SHIP_TILE_SIZE-1, 0, PSET);
 		if (object_get_state(the_ship.ship_obj) != DYING)
+		{
 			cpyv2v(sx, sy, sx+SHIP_TILE_SIZE-1, sy+SHIP_TILE_SIZE-1,
 				GFXPAGE, dx, dy, 0, TPSET);
+			if(shield)
+			{
+				sx = SHIELD_TILE_SIZE * anim_step;
+				cpyv2v(sx, SHIELD_SY,
+				       sx+SHIELD_TILE_SIZE-1,
+				         SHIELD_SY + SHIELD_TILE_SIZE - 1,
+				       GFXPAGE, dx, dy, 0, TPSET);
+			}
+		}
 	}
 }
 	

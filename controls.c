@@ -1,4 +1,4 @@
-/* $Id: controls.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: controls.c,v 1.3 2002/09/29 22:44:51 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -19,7 +19,7 @@
  */
 
 #define ESC 27
-
+#define SHIELDKEY ((int)'m')
 void check_quit(char *quit)
 {
 	if (kbhit())
@@ -54,4 +54,6 @@ void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *
 	}
 	else 
 		*fire = OFF;
+	if(kbhit())
+		*shield=((getch()|32) == SHIELDKEY);
 }
