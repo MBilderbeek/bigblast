@@ -1,4 +1,5 @@
 - Indicatoren: aantal levens, score
+- een "kill all objects", zodat met render_frame() automatisch scores kunnen worden geupdate
 - beetje: beter asteroids kunnen raken met kogels (dia tuning)
 - een klaar (levels?).
 - andere vijanden

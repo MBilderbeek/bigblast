@@ -1,4 +1,4 @@
-/* $Id: renderer.h,v 1.4 2002/11/09 00:22:58 manuel Exp $
+/* $Id: renderer.h,v 1.5 2002/11/19 23:18:15 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -29,7 +29,10 @@
 extern unsigned int frame_counter;
 
 void render_init();
-void render_frame(onoff_t boost, onoff_t shield);
+void playscreen_init();
+void render_frame(onoff_t boost, onoff_t shield, char noflives);
+void write(char *string, unsigned int x, unsigned int  y);
+void write_cent(char *string, unsigned int  y);
 
 #endif
 

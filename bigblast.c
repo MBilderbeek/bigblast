@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.7 2002/11/09 00:22:58 manuel Exp $
+/* $Id: bigblast.c,v 1.8 2002/11/19 23:18:15 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -18,6 +18,12 @@
 #include "scores.h"
 //#include "msxbios.h"
 
+/*
+ * LOCAL DEFINITIONS
+ */
+#define MSG_BASE 60
+#define MSG_BONUS_BASE 80
+
 int *JIFFY = (int *)0xFC9E;
 unsigned int score;
 unsigned char level;
@@ -31,13 +37,38 @@ static int get_rnd_coord(int range)
 	return(coord);
 }
 
-static void add_levelscore(unsigned char level, unsigned char noflives)
+static void add_bonus(unsigned char level, unsigned char noflives)
 {
-	score+=SC_LEVEL(level);
-	if (frame_counter<TIME_BONUS) score+=(TIME_BONUS-frame_counter);
+	char string[100];
+	unsigned int levelbonus, timebonus, shieldbonus, lifebonus;
+	
+	sprintf(string,"BONUS");
+	write_cent(string, MSG_BONUS_BASE);
+	
+	levelbonus=SC_LEVEL(level);
+	score+=levelbonus;
+	sprintf(string,"Level bonus: %d", levelbonus);
+	write_cent(string, MSG_BONUS_BASE + 10);
+	
+	if (frame_counter<TIME_BONUS)
+		timebonus=(TIME_BONUS-frame_counter);
+	else
+		timebonus=0;
+	score+=timebonus;
+	sprintf(string,"Time bonus: %d", timebonus);
+	write_cent(string, MSG_BONUS_BASE + 20);
+
 //	if (bullet_counter<BULLET_BONUS(level)) score+=(BULLET_BONUS(level)-bullet_counter);
-	score+=the_ship.shield_energy;
-	score+=noflives*10;
+
+	shieldbonus=the_ship.shield_energy;
+	score+=shieldbonus;
+	sprintf(string,"Shield bonus: %d", shieldbonus);
+	write_cent(string, MSG_BONUS_BASE + 30);
+	
+	lifebonus=noflives*10;
+	score+=lifebonus;
+	sprintf(string,"Life bonus: %d", lifebonus);
+	write_cent(string, MSG_BONUS_BASE + 40);
 }
 
 void main ()
@@ -45,8 +76,9 @@ void main ()
 	char quit=0;
 	ast_hdl_t a=0;
 	int i=0;
-	char noflives=10;
+	char noflives=9;
 	int fire = 0;
+	char string[100];
 
 	onoff_t boost=OFF;
 	onoff_t shield=OFF;
@@ -80,10 +112,16 @@ void main ()
 	}
 	
 	frame_counter = 0;
+	sprintf(string, "Wave: %02d", level);
+	write_cent(string, 102);
+	*JIFFY=0;
+	while (*JIFFY<50);
+
+	playscreen_init();
 	
 	while (!quit && noflives!=0 && nof_asteroids>0)
 	{
-		render_frame(boost, shield);
+		render_frame(boost, shield, noflives);
 		check_controls(&rotdir, &boost, &shield, &fire);
 		ship_rotate(rotdir);
 		if (boost==ON) ship_accel();
@@ -106,20 +144,35 @@ void main ()
 		if (fire) bullet_fire();
 		check_quit(&quit);
 	}
+	render_frame(boost, shield, noflives); // update noflives on screen
+
 	// end level
+	// 
 	
-	if (nof_asteroids==0) add_levelscore(level, noflives);
-	
-	screen(0);
-	*CLICKSW=clicksw_old;
-	kilbuf();
 	if (nof_asteroids==0)
 	{
-		printf("You won! Good man!\n");
+		add_bonus(level, noflives);
+		sprintf(string,"You won! Good man!\n");
 	}
 	else if (noflives==0)
 	{
-		printf("Game over! You lost! (Sucker!)\n");
+		sprintf(string,"Game over! You lost! (Sucker!)");
 	}
-	printf("Score: %d points.\n", score);
+	else
+		sprintf(string,"Chickening out, eh!? Whimp!");
+	
+	write_cent(string, MSG_BASE);
+	
+	sprintf(string,"Total score: %d points", score);
+	write_cent(string, MSG_BASE+80);
+
+	sprintf(string,"You reached wave %d", level);
+	write_cent(string, MSG_BASE+100);
+
+	kilbuf();
+	while (!kbhit());
+	
+	kilbuf();
+	screen(0);
+	*CLICKSW=clicksw_old;
 }
