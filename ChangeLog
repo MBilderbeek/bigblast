@@ -1,7 +1,8 @@
-$Id: ChangeLog,v 1.18 2003/02/20 22:57:27 manuel Exp $
+$Id: ChangeLog,v 1.19 2003/02/20 23:23:08 manuel Exp $
 
 2003/02/21 Manuel & Eric
-	* Shield-o-meter (TM) now works better. Perfectly, actually.
+	* Shield-o-meter (TM) now works better. Perfectly, actually
+	* Clearing a level with shield and last life works now OK
 
 2003/02/17 Eric
 	* Improved separation between renderer and object behviour by

@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.15 2003/02/16 15:34:01 eric Exp $
+/* $Id: bigblast.c,v 1.16 2003/02/20 23:23:08 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -124,7 +124,7 @@ void play_level(char level)
 			  
 	}
 	
-	while (!quit && noflives!=0 && not_finished)
+	while (!quit && not_finished)
 	{
 		render_frame(boost, shield, noflives);
 		bullets_n_asteroids();
@@ -139,6 +139,7 @@ void play_level(char level)
 			if (object_get_state(the_ship.ship_obj)==DYING)
 			{
 				ship_destroy();
+				--noflives;
 				boost=OFF;
 			}
 			else if (ship_hit())
@@ -156,7 +157,7 @@ void play_level(char level)
 		}
 		else
 		{
-			if ((!nof_bullets)&&(!nof_explosions)&&(--noflives))
+			if ((!nof_bullets)&&(!nof_explosions)&&(noflives))
 			{
 				ship_init();
 			}
@@ -166,7 +167,8 @@ void play_level(char level)
 		explosions_move();
 
 		quit=check_quit();
-		not_finished=(nof_explosions || nof_bullets || nof_asteroids);
+		not_finished=(nof_explosions || nof_bullets || (nof_asteroids &&
+				noflives));
 	}
 	render_info(noflives); // update noflives on screen
 	if (nof_asteroids==0)
@@ -178,7 +180,6 @@ void play_level(char level)
 		while (*JIFFY<100);
 		while (!keypressed());
 	}
-
 }
 
 void play_game()
@@ -186,7 +187,7 @@ void play_game()
 	char string[100];
 	score = 0;
 	level = 0;
-	noflives=5;
+	noflives=1;
 
 	while (!quit && noflives>0)
 	{
@@ -195,8 +196,11 @@ void play_game()
 
 	if (noflives==0) // This means that !quit==TRUE implicitly
 	{
+		int ypos=MSG_BASE;
+		if (nof_asteroids==0) ypos-=20;
+		
 		sprintf(string,"Game over!");
-		write_cent(string, MSG_BASE);
+		write_cent(string, ypos);
 	
 		sprintf(string,"Total score: %d points", score);
 		write_cent(string, MSG_BASE+80);
