@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.2 2002/10/31 23:45:19 manuel Exp $
+$Id: ChangeLog,v 1.3 2002/11/01 17:57:18 eric Exp $
+
+2002/11/02 Manuel & Eric
+	* Added autoshield at the beginning
+	* Shield energy now used
 
 2002/11/01 Manuel & Eric
 	* Fixed bug in redraw of dying ship in renderer.c

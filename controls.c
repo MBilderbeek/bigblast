@@ -1,4 +1,4 @@
-/* $Id: controls.c,v 1.4 2002/10/05 20:31:45 eric Exp $
+/* $Id: controls.c,v 1.5 2002/11/01 17:57:18 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -11,6 +11,7 @@
  */
 
 #include "types.h"
+#include "ship.h" // for the shield_energy variable in the_ship
 //#include "msxbios.h"
 #include "controls.h"
 
@@ -58,5 +59,6 @@ void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *
 	}
 	else 
 		*fire = OFF;
-	*shield=SHIFT_PRESSED;
+	*shield=(SHIFT_PRESSED || the_ship.shield_energy > AUTOSHIELD_THRESHOLD) 
+			&& the_ship.shield_energy > 0;
 }

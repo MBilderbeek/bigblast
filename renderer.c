@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.7 2002/10/31 23:45:19 manuel Exp $
+/* $Id: renderer.c,v 1.8 2002/11/01 17:57:18 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -136,6 +136,9 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	int x_prev = object_get_x_prev(the_ship.ship_obj);
 	int y_prev = object_get_y_prev(the_ship.ship_obj);
 	static onoff_t shield_prev;
+
+	if (the_ship.shield_energy > 0 && shield == ON)
+		the_ship.shield_energy--;
 	
 	sx = (the_ship.heading & 0x0F) << 4; 
 	sy = the_ship.heading & 0xF0; 

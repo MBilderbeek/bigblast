@@ -1,4 +1,4 @@
-/* $Id: ship.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: ship.h,v 1.3 2002/11/01 17:57:18 eric Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -21,6 +21,7 @@
 
 #define MAX_NOF_SHIPS 2
 #define MAX_SHIELD_ENERGY 255
+#define AUTOSHIELD_THRESHOLD 240
 #define MAX_HEADING 32
 
 /*
