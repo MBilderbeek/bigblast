@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.24 2003/05/29 21:56:46 manuel Exp $
+/* $Id: bigblast.c,v 1.25 2003/05/29 22:48:10 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -52,6 +52,18 @@ static int get_rnd_coord(int range)
 	return(coord);
 }
 
+static void get_rnd_border_coord(int *x, int *y)
+{
+	switch(rand()&0x03)
+	{
+		case 0: *x=0; *y=rand()%OBJ_MAX_Y; break;
+		case 1: *y=0; *x=rand()%OBJ_MAX_Y; break;
+		case 2: *x=OBJ_MAX_X-1; *y=rand()%OBJ_MAX_Y; break;
+		case 3: *y=OBJ_MAX_Y-1; *x=rand()%OBJ_MAX_Y; break;
+		default: /*kernel panic!*/ break;
+	}
+}
+
 static void add_bonus(unsigned char level, unsigned char noflives)
 {
 	char string[100];
@@ -91,7 +103,7 @@ static void add_bonus(unsigned char level, unsigned char noflives)
 void play_level(char level)
 {
 	onoff_t fire = OFF;
-	int i;
+	int i, tmp_x, tmp_y;
 	ast_hdl_t a=0;
 	char string[100];
 	char not_finished = 1;
@@ -121,15 +133,16 @@ void play_level(char level)
 	
 	for (i=0; i<1+level; i++) // Actually: load level data or so
 	{
-		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
-				       get_rnd_coord(OBJ_MAX_Y), AST_BIG, 
+		get_rnd_border_coord(&tmp_x, &tmp_y);
+		a = asteroid_create(tmp_x, tmp_y, AST_BIG, 
 				       i==0 ? AST_TYPE_HOMING : AST_TYPE_NORMAL);
 		object_accel(the_asteroids[a].asteroid_obj,
 			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
 			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
 			  
 	}
-	ufo_create(0,0);
+	get_rnd_border_coord(&tmp_x, &tmp_y);
+	ufo_create(tmp_x,tmp_y);
 
 	while (!quit && not_finished)
 	{

@@ -1,7 +1,8 @@
-$Id: ChangeLog,v 1.27 2003/05/29 21:56:46 manuel Exp $
+$Id: ChangeLog,v 1.28 2003/05/29 22:48:10 manuel Exp $
 
 2003/05/30 Manuel & Eric
 	* Added a homing tinkeroid! Watch it, buddy! Search and destroy...
+	* UFO and other enemies appear at the border now
 
 2003/05/10 Manuel & Eric
 	* Fixed tinkeroid bug
