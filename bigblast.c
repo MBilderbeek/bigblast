@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.21 2003/03/21 11:29:01 manuel Exp $
+/* $Id: bigblast.c,v 1.22 2003/04/03 23:07:23 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -172,6 +172,7 @@ void play_level(char level)
 			}
 		}	
 		ufo_move();
+		ufo_bullet_move();
 		asteroids_move();
 		bullets_move();
 		explosions_move();

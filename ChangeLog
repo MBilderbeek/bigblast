@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.24 2003/03/21 11:29:01 manuel Exp $
+$Id: ChangeLog,v 1.25 2003/04/03 23:07:23 manuel Exp $
+
+
+2003/04/04 Manuel & Eric
+	* UFOs fire bullets at the player! (speed needs fixing)
 
 2003/03/21 Manuel
 	* Several small fixes:

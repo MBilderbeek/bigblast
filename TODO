@@ -1,3 +1,4 @@
+- snelheid UFO bullet mag wel wat uniformer
 - bug oplossen als tinkeroid je raakt terwijl je stilstaat: uit elkaar vliegen
 - optimalisatie: hou aantal astroids/kogels/explosies bij zodat als je ze
   allemaal gehad hebt je niet meer hoeft te zoeken -> implementeren voor

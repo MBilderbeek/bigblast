@@ -1,4 +1,4 @@
-/* $Id: bullet.h,v 1.3 2003/02/14 17:52:28 eric Exp $
+/* $Id: bullet.h,v 1.4 2003/04/03 23:07:23 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -20,6 +20,8 @@
  */
 
 #define MAX_NOF_BULLETS 6
+#define NEW_BULLET_AGE   12
+#define BULLET_SIZE      ((int)2 << OBJ_GFX_FACTOR)
 
 /*
  * TYPE DEFINITIONS

@@ -1,4 +1,4 @@
-/* $Id: bullet.c,v 1.5 2003/02/16 15:34:01 eric Exp $
+/* $Id: bullet.c,v 1.6 2003/04/03 23:07:23 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -18,8 +18,6 @@
  * LOCAL DEFINITIONS
  */
 
-#define BULLET_SIZE      ((int)2 << OBJ_GFX_FACTOR)
-#define NEW_BULLET_AGE   12
 #define BULLET_SPEED(x)  ((x) << 2)
 
 bullet_t the_bullets[MAX_NOF_BULLETS];

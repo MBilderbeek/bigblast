@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.16 2003/03/21 11:29:01 manuel Exp $
+/* $Id: collisio.c,v 1.17 2003/04/03 23:07:23 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -64,7 +64,7 @@ char ship_hit(void) // hip shit?
 {
 	char      i, hit   = 0;
 	obj_hdl_t ship_obj = the_ship.ship_obj;
-	obj_hdl_t ast_obj, ufo_obj;
+	obj_hdl_t ast_obj, ufo_obj, ufo_bullet_obj;
 	int       weight;
 	int       delta_dx, delta_dy;
 	char      counter = 0;
@@ -115,9 +115,8 @@ char ship_hit(void) // hip shit?
 				if (!the_asteroids[i].steel)
 				    object_set_state(ast_obj, DYING); //destroy in bullets check
 				else
-					object_accel(ast_obj,
-					    -(delta_dx >> weight),
-					    -(delta_dy >> weight));
+					object_accel(ast_obj, 
+									-(delta_dx>>weight),-(delta_dy>>weight));
 					
 				hit = 1;
 			}
@@ -135,6 +134,13 @@ char ship_hit(void) // hip shit?
 		
 		object_set_state(ufo_obj, DYING);
 		hit=1;
+	}
+	// check ufo bullet
+	if (((ufo_bullet_obj = the_ufo_bullet.bullet_obj) != OBJ_VOID) &&
+				objects_hit(ufo_bullet_obj, ship_obj)) 
+	{
+			the_ufo_bullet.age = 1; // kaput!
+			hit = 1;
 	}
 	
 	return (hit);

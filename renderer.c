@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.23 2003/03/21 11:29:01 manuel Exp $
+/* $Id: renderer.c,v 1.24 2003/04/03 23:07:23 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -207,37 +207,35 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	int y_prev = object_get_y_prev(ship_obj);
 	static onoff_t shield_prev=0;
 
-	if ( (x_cur != x_prev) || (y_cur != y_prev) ||
+	if ((x_cur != x_prev) || (y_cur != y_prev) ||
 	     (the_ship.heading != the_ship.heading_prev) ||
 	     (object_get_state(ship_obj) == NEW)||
-	     (object_get_state(ship_obj) == DYING)||
-	     shield || shield_prev )
+	     (object_get_state(ship_obj) == DYING)|| shield || shield_prev)
 	{
 		tilesize = OBJ2GFX(object_get_size(ship_obj)) - 1;
-		if ( object_get_state(ship_obj) == NEW )
+		if (object_get_state(ship_obj) == NEW)
 			object_set_state(ship_obj, ALIVE);
 		else
 		{
-			dx_prev = OBJ2GFX( x_prev );
-			dy_prev = OBJ2GFX( y_prev );
+			dx_prev = OBJ2GFX(x_prev);
+			dy_prev = OBJ2GFX(y_prev);
 			cpyv2v(dx_prev, dy_prev,
 			       dx_prev+tilesize, dy_prev+tilesize, BGPAGE,
 			       dx_prev, dy_prev, GAMEPAGE, PSET);
 		}
 		if (object_get_state(ship_obj) != DYING)
 		{
-			dx = OBJ2GFX( x_cur );
-			dy = OBJ2GFX( y_cur );
+			dx = OBJ2GFX(x_cur);
+			dy = OBJ2GFX(y_cur);
 			sx = (the_ship.heading & 0x0F) << 4; 
 			sy = the_ship.heading & 0xF0; 
 			if (boost == ON) sy+=BOOST_OFFSET;
-			cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE,
-			       dx, dy, GAMEPAGE, TPSET);
+			cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE, dx, dy, GAMEPAGE,
+							TPSET);
 			if(shield)
 			{
 				sx = SHIELD_SX + SHIELD_TILE_SIZE * anim_step;
-				cpyv2v(sx, SHIELD_SY,
-				       sx+SHIELD_TILE_SIZE-1,
+				cpyv2v(sx, SHIELD_SY, sx+SHIELD_TILE_SIZE-1,
 				         SHIELD_SY + SHIELD_TILE_SIZE - 1,
 				       GFXPAGE, dx, dy, GAMEPAGE, TPSET);
 			}
@@ -267,21 +265,16 @@ static void render_asteroids()
 			counter--;
 			x_cur = object_get_x(the_asteroids[i].asteroid_obj);
 			y_cur = object_get_y(the_asteroids[i].asteroid_obj);
-			x_prev = object_get_x_prev(
-					the_asteroids[i].asteroid_obj);
-			y_prev = object_get_y_prev(
-					the_asteroids[i].asteroid_obj);
+			x_prev = object_get_x_prev(the_asteroids[i].asteroid_obj);
+			y_prev = object_get_y_prev(the_asteroids[i].asteroid_obj);
 
+			tilesize = OBJ2GFX(object_get_size(the_asteroids[i].asteroid_obj));
 
-			tilesize = OBJ2GFX(object_get_size(
-				      the_asteroids[i].asteroid_obj));
-
-			dx_prev = OBJ2GFX( x_prev );
-			dy_prev = OBJ2GFX( y_prev );
+			dx_prev = OBJ2GFX(x_prev);
+			dy_prev = OBJ2GFX(y_prev);
 
 			tilesize--;
-			cpyv2v(dx_prev, dy_prev, 
-			       dx_prev+tilesize, dy_prev+tilesize, 
+			cpyv2v(dx_prev, dy_prev, dx_prev+tilesize, dy_prev+tilesize, 
 			       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
 				
 			state = object_get_state(the_asteroids[i].asteroid_obj);
@@ -314,8 +307,8 @@ static void render_asteroids()
 				offset = (AST_TILE_SIZE - tilesize)>>1;
 				sx += animstep*AST_TILE_SIZE + offset;
 				sy += offset;
-				dx = OBJ2GFX( x_cur );
-				dy = OBJ2GFX( y_cur );
+				dx = OBJ2GFX(x_cur);
+				dy = OBJ2GFX(y_cur);
 				cpyv2v(sx, sy, sx+tilesize, sy+tilesize,
 				       GFXPAGE, dx, dy, GAMEPAGE, TPSET);
 			}
@@ -323,49 +316,46 @@ static void render_asteroids()
 	}
 }
 
-static void render_bullets()
+static void render_bullet_obj(obj_hdl_t bullet_obj)
 {
-	char i;
-//	int sx = 0;
 	int dx, dy;
 	int dx_prev, dy_prev;
 	int x_cur, y_cur;
 	int x_prev, y_prev;
 	int size;
 	
-	for (i=0; i<MAX_NOF_BULLETS; i++)
+	if (bullet_obj != OBJ_VOID)
 	{
-		if (the_bullets[i].bullet_obj != OBJ_VOID)
-		{
-			x_cur = object_get_x(the_bullets[i].bullet_obj);
-			y_cur = object_get_y(the_bullets[i].bullet_obj);
-			x_prev = object_get_x_prev(
-					the_bullets[i].bullet_obj);
-			y_prev = object_get_y_prev(
-					the_bullets[i].bullet_obj);
-			dx_prev = OBJ2GFX( x_prev );
-			dy_prev = OBJ2GFX( y_prev );
-			size = OBJ2GFX(
-				  object_get_size(the_bullets[i].bullet_obj))
-			       - 1;
+		x_cur = object_get_x(bullet_obj);
+		y_cur = object_get_y(bullet_obj);
+		x_prev = object_get_x_prev(bullet_obj);
+		y_prev = object_get_y_prev(bullet_obj);
+		dx_prev = OBJ2GFX(x_prev);
+		dy_prev = OBJ2GFX(y_prev);
+		size = OBJ2GFX(object_get_size(bullet_obj)) - 1;
 
-			cpyv2v(dx_prev, dy_prev,
-			       dx_prev+size, dy_prev+size, 
+		cpyv2v(dx_prev, dy_prev, dx_prev+size, dy_prev+size, 
 			       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
-			if (object_get_state(the_bullets[i].bullet_obj)
-					!= DYING)
-			{
-				dx = OBJ2GFX( x_cur );
-				dy = OBJ2GFX( y_cur );
-				boxfill(dx, dy, dx+size, dy+size, 
-					15, PSET); // temporary
+		if (object_get_state(bullet_obj) != DYING)
+		{
+			dx = OBJ2GFX(x_cur);
+			dy = OBJ2GFX(y_cur);
+			boxfill(dx, dy, dx+size, dy+size, 15, PSET); // temporary
 
-/*				cpyv2v(BULLET_SX, BULLET_SY,
-				       BULLET_SX+size, BULLET_SY+size,
+/*			cpyv2v(BULLET_SX, BULLET_SY, BULLET_SX+size, BULLET_SY+size,
 				       GFXPAGE, dx, dy, GAMEPAGE, TPSET);*/
-			}
 		}
 	}
+}
+
+static void render_bullets()
+{
+	char i;
+	for (i=0; i<MAX_NOF_BULLETS; i++)
+	{
+		render_bullet_obj(the_bullets[i].bullet_obj);
+	}
+	render_bullet_obj(the_ufo_bullet.bullet_obj);
 }
 
 static void render_explosions()
@@ -388,27 +378,22 @@ static void render_explosions()
 			counter--;
 			x_cur = object_get_x(the_explosions[i].explosion_obj);
 			y_cur = object_get_y(the_explosions[i].explosion_obj);
-			x_prev = object_get_x_prev(
-					the_explosions[i].explosion_obj);
-			y_prev = object_get_y_prev(
-					the_explosions[i].explosion_obj);
+			x_prev = object_get_x_prev(the_explosions[i].explosion_obj);
+			y_prev = object_get_y_prev(the_explosions[i].explosion_obj);
 
-			if ( (x_cur != x_prev) || (y_cur != y_prev) )
+			if ((x_cur != x_prev) || (y_cur != y_prev))
 			{
 				tilesize = OBJ2GFX(object_get_size(
 					the_explosions[i].explosion_obj));
 				
-				dx_prev = OBJ2GFX( x_prev );
-				dy_prev = OBJ2GFX( y_prev );
+				dx_prev = OBJ2GFX(x_prev);
+				dy_prev = OBJ2GFX(y_prev);
 
 				tilesize--;
-				cpyv2v(dx_prev, dy_prev, 
-				       dx_prev+tilesize, dy_prev+tilesize, 
-				       BGPAGE,
-				       dx_prev, dy_prev, GAMEPAGE, PSET);
+				cpyv2v(dx_prev, dy_prev, dx_prev+tilesize, dy_prev+tilesize, 
+				       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
 
-				state = object_get_state(
-					  the_explosions[i].explosion_obj);
+				state = object_get_state(the_explosions[i].explosion_obj);
 				if(state != DYING)
 				{
 					switch (the_explosions[i].size)
@@ -428,17 +413,14 @@ static void render_explosions()
 					default:
 						break;
 					}
-					animstep= NEW_EXPLOSION_AGE
-						  - the_explosions[i].age;
+					animstep= NEW_EXPLOSION_AGE - the_explosions[i].age;
 					offset = (EXP_TILE_SIZE - tilesize)>>1;
 					sx += animstep*EXP_TILE_SIZE + offset;
 					sy += offset;
-					dx = OBJ2GFX( x_cur );
-					dy = OBJ2GFX( y_cur );
-					cpyv2v(sx, sy,
-					       sx+tilesize, sy+tilesize,
-					       GFXPAGE,
-					       dx, dy, GAMEPAGE, TPSET);
+					dx = OBJ2GFX(x_cur);
+					dy = OBJ2GFX(y_cur);
+					cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE, dx, dy, 
+									GAMEPAGE, TPSET);
 				}
 			}
 		}
@@ -458,7 +440,7 @@ static void render_ufo ()
 	int anim_step = frame_counter % 4;
 	obj_hdl_t ufo_obj = the_ufo.ufo_obj;
 
-	if ( ufo_obj != OBJ_VOID )
+	if (ufo_obj != OBJ_VOID)
 	{
 		x_cur = object_get_x(ufo_obj);
 		y_cur = object_get_y(ufo_obj);
@@ -467,8 +449,7 @@ static void render_ufo ()
 		tilesize = OBJ2GFX(object_get_size(ufo_obj)) - 1;
 		dx = OBJ2GFX(x_prev);
 		dy = OBJ2GFX(y_prev);
-		cpyv2v(dx,dy, dx+tilesize, dy+tilesize, BGPAGE,
-		       dx,dy, GAMEPAGE, PSET);
+		cpyv2v(dx,dy, dx+tilesize, dy+tilesize, BGPAGE, dx,dy, GAMEPAGE, PSET);
 
 		state = object_get_state(ufo_obj);
 		if(state != DYING)
@@ -477,8 +458,8 @@ static void render_ufo ()
 			dy = OBJ2GFX(y_cur);
 			sx = UFO_SX + anim_step * (tilesize + 1);
 			sy = UFO_SY;
-			cpyv2v(sx, sy, sx + tilesize, sy + tilesize,
-				GFXPAGE, dx, dy, GAMEPAGE, TPSET);
+			cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE, dx, dy, GAMEPAGE,
+							TPSET);
 		}
 	}
 }
