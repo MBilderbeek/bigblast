@@ -1,7 +1,5 @@
-- Indicatoren: aantal levens, shield power
-- score
+- Indicatoren: aantal levens, score
 - beetje: beter asteroids kunnen raken met kogels (dia tuning)
 - een klaar (levels?).
 - andere vijanden
 - eventuele optimalisaties van het e.e.a., vooral de collisiondetection
-
