@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.12 2002/12/26 23:54:11 manuel Exp $
+/* $Id: renderer.c,v 1.13 2002/12/27 00:26:06 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -78,7 +78,6 @@ static void render_ship(onoff_t boost, onoff_t shield);
 static void render_asteroids();
 static void render_bullets();
 static void generate_background();
-static void render_info(char noflives);
 
 int *Timer=(int *)0xFC9E;                                /*Systeemtimer*/
 
