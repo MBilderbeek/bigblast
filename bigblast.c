@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.18 2003/03/01 22:56:57 eric Exp $
+/* $Id: bigblast.c,v 1.19 2003/03/14 00:49:35 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -131,6 +131,7 @@ void play_level(char level)
 	{
 		render_frame(boost, shield, noflives);
 		bullets_n_asteroids();
+		bullets_n_ufo();
 		if (the_ship.ship_obj!=OBJ_VOID)
 		{
 			check_controls(&rotdir, &boost, &shield, &fire);

@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.13 2003/03/01 22:56:57 eric Exp $
+/* $Id: collisio.c,v 1.14 2003/03/14 00:49:35 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -14,6 +14,7 @@
 #include "object.h"
 #include "ship.h"
 #include "asteroid.h"
+#include "ufo.h"
 #include "bullet.h"
 #include "scores.h"
 
@@ -21,9 +22,8 @@
  * LOCAL DEFINITIONS
  */
 
-#define AST_SHIP_SLACK GFX2OBJ(4)
+//#define AST_SHIP_SLACK GFX2OBJ(4) -> move to ship size
 
-static void bullets_n_one_ast(asteroid_t *ast);
 /*
  * EXTERNAL FUNCTIONS
  */
@@ -43,20 +43,32 @@ static int get_center_y(obj_hdl_t obj)
 	return object_get_y(obj) + (object_get_size(obj) >> 1);
 }
 
-char ship_hit(void)
+static char objects_hit(obj_hdl_t obj1, obj_hdl_t obj2) // object_shit?
+{
+	int x1 = get_center_x(obj1);
+	int dist = (object_get_size(obj1)+object_get_size(obj2)) >> 1; //=dia1+dia2
+	int x2 = get_center_x(obj2);
+	char result=0;
+
+	if (iabs(x2-x1) <= dist)
+	{
+		int y1 = get_center_y(obj1);
+		int y2 = get_center_y(obj2);
+		if (iabs(y2-y1) <= dist) result=1;
+	}
+	return result;
+}
+
+char ship_hit(void) // hip shit?
 {
 	char      i, hit   = 0;
 	obj_hdl_t ship_obj = the_ship.ship_obj;
-	int       ship_x   = get_center_x(ship_obj); 
-	int       ship_y   = get_center_y(ship_obj); 
-	char      ship_dx;
-	char      ship_dy;
-	obj_hdl_t ast_obj;
+	obj_hdl_t ast_obj, ufo_obj;
 	int       weight;
-	int       ast_x, ast_y;
-	int       delta_x, delta_y, delta_dia;
+	int       delta_dx, delta_dy;
 	char      counter = 0;
 
+	// check asteroids
 	for (i=0; i<MAX_NOF_ASTEROIDS && !hit && counter<=nof_asteroids; i++)
 	{
 		if (the_asteroids[i].size != AST_NONE)
@@ -64,58 +76,102 @@ char ship_hit(void)
 			counter++;
 			ast_obj = the_asteroids[i].asteroid_obj;
 
-			delta_dia = object_get_size(ast_obj);
-			ast_x = get_center_x(ast_obj);
-			
-			delta_dia += object_get_size(ship_obj)-AST_SHIP_SLACK;
-			delta_dia >>= 1;
-			
-			delta_x = ast_x - ship_x;
-			if (iabs(delta_x) <= delta_dia)
+			if (objects_hit(ast_obj, ship_obj))
 			{
-				ast_y = get_center_y(ast_obj);
-				delta_y = ast_y - ship_y;
-				if (iabs(delta_y) <= delta_dia)
-				{
-					ship_dx = object_get_dx(ship_obj); 
-					ship_dy = object_get_dy(ship_obj); 
-					/* calc speed of asteroid with respect
-					 * to ship (ast's momentum) */
-					delta_x = object_get_dx(ast_obj)
-						  - ship_dx;
-					delta_y = object_get_dy(ast_obj)
-						  - ship_dy;
-					weight = AST_BIG
-						 - the_asteroids[i].size;
+				/* calc speed of asteroid with respect
+				 * to ship (ast's momentum) */
+				delta_dx = object_get_dx(ast_obj) - object_get_dx(ship_obj);
+				delta_dy = object_get_dy(ast_obj) - object_get_dy(ship_obj);
+				weight = AST_BIG - the_asteroids[i].size;
 
-					/* ship gets (part of) ast's momentum */
-					object_accel(the_ship.ship_obj,
-						   delta_x >> weight,
-						   delta_y >> weight);
+				/* ship gets (part of) ast's momentum */
+				object_accel(ship_obj, delta_dx >> weight, delta_dy >> weight);
 
-					/* ast loses (part of) its momentum */
-					// But this looks unnatural since it is
-					// only debris!
-					//object_accel(ast_obj,
-					//	     -(delta_x >> ast_size),
-					//	     -(delta_y >> ast_size));
+				/* ast loses (part of) its momentum */
+				// But this looks unnatural since it is
+				// only debris!
+				//object_accel(ast_obj,
+				//	     -(delta_dx >> ast_size),
+				//	     -(delta_dy >> ast_size));
 
 					
-					if (!the_asteroids[i].steel)
-					    object_set_state(ast_obj, DYING);
-					else
-						object_accel(ast_obj,
-						    -(delta_x >> weight),
-						    -(delta_y >> weight));
-						
-					hit = 1;
-				}
+				if (!the_asteroids[i].steel)
+				    object_set_state(ast_obj, DYING); //destroy in bullets check
+				else
+					object_accel(ast_obj,
+					    -(delta_dx >> weight),
+					    -(delta_dy >> weight));
+					
+				hit = 1;
 			}
 		}
 	}
+	
+	// check ufo
+	if (((ufo_obj = the_ufo.ufo_obj) != OBJ_VOID) && 
+			objects_hit(ufo_obj, ship_obj))
+	{
+		delta_dx = object_get_dx(ufo_obj) - object_get_dx(ship_obj);
+		delta_dy = object_get_dy(ufo_obj) - object_get_dy(ship_obj);
+
+		object_accel(ship_obj, delta_dx, delta_dy);
+		
+		object_set_state(ufo_obj, DYING);
+		hit=1;
+	}
+	
 	return (hit);
 }
 
+static void bullets_n_object(obj_hdl_t obj, char unbreakable)
+{
+	int b;
+	obj_hdl_t bul_obj;
+
+	for (b=0; b<MAX_NOF_BULLETS; b++)
+	{
+		if(the_bullets[b].age > 1)
+		{
+			bul_obj = the_bullets[b].bullet_obj;
+			if (objects_hit(bul_obj, obj))
+			{
+				if (unbreakable)
+				{
+					int bx = object_get_dx(bul_obj);
+					int by = object_get_dy(bul_obj);
+					object_accel(obj, (bx>>5),
+							(by>>5));
+				}
+				else
+					object_set_state(obj, DYING);
+				the_bullets[b].age = 1;
+			}
+		}
+	}
+}
+
+void bullets_n_ufo()
+{
+	obj_hdl_t ufo_obj = the_ufo.ufo_obj;
+	
+	if(ufo_obj != OBJ_VOID)
+	{
+		state_e ufo_state = object_get_state(ufo_obj);
+
+		switch(ufo_state)
+		{
+			case DYING:
+				score+=SC_UFO; 
+				ufo_destroy(1); // with explosion
+				break;
+			case ALIVE:
+			case NEW:
+				bullets_n_object(ufo_obj, 0); // not steel
+				break;
+			default: break;
+		}
+	}
+}
 
 void bullets_n_asteroids()
 {
@@ -138,16 +194,17 @@ void bullets_n_asteroids()
 			case DYING:
 				switch (the_asteroids[i].size)
 				{
-				case AST_SMALL: score+=SC_AST_SMALL; break;
-				case AST_MEDIUM: score+=SC_AST_MEDIUM; break;
-				case AST_BIG: score+=SC_AST_BIG; break;
-				default: ;
+					case AST_SMALL: score+=SC_AST_SMALL; break;
+					case AST_MEDIUM: score+=SC_AST_MEDIUM; break;
+					case AST_BIG: score+=SC_AST_BIG; break;
+					default: ;
 				}
 				asteroid_destroy(i);
 				break;
 			case ALIVE:
 			case NEW:
-				bullets_n_one_ast(&the_asteroids[i]);
+				bullets_n_object(the_asteroids[i].asteroid_obj,
+						 the_asteroids[i].steel);
 				break;
 			default: break;
 			}
@@ -155,42 +212,4 @@ void bullets_n_asteroids()
 	}
 }
 
-static void bullets_n_one_ast(asteroid_t *ast)
-{
-	obj_hdl_t ast_obj = ast->asteroid_obj;
-	int ax = get_center_x(ast_obj);
-	int ay = get_center_y(ast_obj);
-	int ast_dia = object_get_size(ast_obj) >> 1;
 
-	int b, bx, by, bul_dia;
-
-	obj_hdl_t bul_obj;
-
-	for (b=0; b<MAX_NOF_BULLETS; b++)
-	{
-		if(the_bullets[b].age > 1)
-		{
-			bul_obj = the_bullets[b].bullet_obj;
-			bul_dia = object_get_size(bul_obj) >> 1;
-			bx = get_center_x(bul_obj);
-			if (iabs(ax-bx) <= ast_dia + bul_dia)
-			{
-				by = get_center_y(bul_obj);
-				if (iabs(ay-by) <= ast_dia + bul_dia)
-				{
-					if (ast->steel)
-					{
-						bx = object_get_dx(bul_obj);
-						by = object_get_dy(bul_obj);
-						object_accel(ast_obj, (bx>>5),
-								(by>>5));
-					}
-					else
-						object_set_state(ast_obj, DYING);
-					the_bullets[b].age = 1;
-				}
-			}
-		}
-	}
-}
-	

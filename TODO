@@ -1,7 +1,10 @@
+- bug oplossen als tinkeroid je raakt terwijl je stilstaat: uit elkaar vliegen
 - optimalisatie: hou aantal astroids/kogels/explosies bij zodat als je ze
   allemaal gehad hebt je niet meer hoeft te zoeken -> implementeren voor
   kogels?
 - echtere levels
-- andere vijanden, behalve tinkbare asteroids dan, want die hebben we al
+- andere vijanden, behalve tinkbare asteroids en ufo's dan, want die hebben we
+  al
+- schietende ufo's, want nu zijn ze wat saai
 - graphics
 - geluid

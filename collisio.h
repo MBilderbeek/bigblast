@@ -1,4 +1,4 @@
-/* $Id: collisio.h,v 1.4 2003/02/14 00:17:15 manuel Exp $
+/* $Id: collisio.h,v 1.5 2003/03/14 00:49:35 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -20,5 +20,9 @@
  */
 
 char ship_hit(void);
+
+void bullets_n_asteroids();
+
+void bullets_n_ufo();
 
 #endif

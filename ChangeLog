@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.21 2003/03/01 22:58:49 eric Exp $
+$Id: ChangeLog,v 1.22 2003/03/14 00:49:35 manuel Exp $
+
+2003/03/14 Eric & Manuel
+	* Code cleanup in collision detection
+	* UFO's can be hit by bullets and the ship
 
 2003/03/02 Eric
 	* Added an UFO - it just flies

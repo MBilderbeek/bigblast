@@ -1,4 +1,4 @@
-/* $Id: scores.h,v 1.2 2002/11/09 00:26:31 manuel Exp $
+/* $Id: scores.h,v 1.3 2003/03/14 00:49:35 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -11,6 +11,7 @@ extern unsigned int score;
 #define SC_AST_SMALL 20
 #define SC_AST_MEDIUM 15
 #define SC_AST_BIG 10
+#define SC_UFO 25
 
 #define SC_LEVEL(l) (100*l)
 
