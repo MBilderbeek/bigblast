@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.19 2003/02/16 15:34:01 eric Exp $
+/* $Id: renderer.c,v 1.20 2003/02/20 22:57:27 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -131,7 +131,7 @@ void playscreen_init()
 	write("Lives:", LIVES_X, LIVES_Y);
 
 	boxline (SHIELD_O_METER_X,SHIELD_O_METER_Y, 
-		 SHIELD_O_METER_X+63+2,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
+		 SHIELD_O_METER_X+63+1,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
 		 C_WHITE, PSET);
 	
 }
@@ -437,8 +437,8 @@ void render_info(char noflives)
 			SHIELD_O_METER_Y+SHIELD_O_METER_H-2, 
 			C_SHIELD_O_METER, PSET);
 	if (shield_stat<63)
-		boxfill (SHIELD_O_METER_X+shield_stat+1,SHIELD_O_METER_Y+1, 
-			SHIELD_O_METER_X+64-2,
+		boxfill (SHIELD_O_METER_X+1+shield_stat,SHIELD_O_METER_Y+1, 
+			SHIELD_O_METER_X+63,
 			SHIELD_O_METER_Y+SHIELD_O_METER_H-2, C_BLACK, PSET);
 	
 	sprintf(str, "%05d", score);

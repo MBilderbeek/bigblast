@@ -1,4 +1,7 @@
-$Id: ChangeLog,v 1.17 2003/02/16 15:34:01 eric Exp $
+$Id: ChangeLog,v 1.18 2003/02/20 22:57:27 manuel Exp $
+
+2003/02/21 Manuel & Eric
+	* Shield-o-meter (TM) now works better. Perfectly, actually.
 
 2003/02/17 Eric
 	* Improved separation between renderer and object behviour by
