@@ -1,4 +1,4 @@
-/* $Id: controls.c,v 1.5 2002/11/01 17:57:18 eric Exp $
+/* $Id: controls.c,v 1.6 2002/12/26 23:54:11 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -11,8 +11,8 @@
  */
 
 #include "types.h"
+#include "msxbios.h"
 #include "ship.h" // for the shield_energy variable in the_ship
-//#include "msxbios.h"
 #include "controls.h"
 
 /*
@@ -26,9 +26,9 @@
 #define ESC_PRESSED CHECK_KEYBMX(7,2)
 #define SHIFT_PRESSED CHECK_KEYBMX(6,0)
 
-void check_quit(char *quit)
+char check_quit()
 {
-	*quit=ESC_PRESSED;
+	return(ESC_PRESSED);
 }
 
 void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *fire)

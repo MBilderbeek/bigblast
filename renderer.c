@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.11 2002/11/21 23:46:58 manuel Exp $
+/* $Id: renderer.c,v 1.12 2002/12/26 23:54:11 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -12,13 +12,13 @@
 
 #include "stdlib.h"
 #include "glib.h"
-#include "string.h"
 #include "ship.h"
 #include "asteroid.h"
 #include "bullet.h"
 #include "renderer.h"
 #include "object.h"
 #include "scores.h"
+#include "font.h"
 
 /*
  * LOCAL DEFINITIONS
@@ -31,14 +31,9 @@
 #define AST_SX_SMALL (8*AST_TILE_SIZE)
 #define AST_SY (4*SHIP_TILE_SIZE)
 #define SHIELD_SY (AST_SY + 16)
-#define GFXPAGE 2
 #define BGPAGE  3
 #define GAMEPAGE 0
-
-#define FONT_Y 188
-#define FONT_W 6
-#define FONT_H 8
-#define FONT_CPL 42 // Nof characters on a line
+// GFXPAGE: see renderer.h
 
 #define SCORE_Y (212-FONT_H+1) // go to the edge; compensate for empty line
 #define SCORE_X 0
@@ -101,10 +96,6 @@ void render_init()
 	ginit();
 	color(15,0,0);
 	screen(5);
-	for(i=0; i<16;i++)
-	{
-		setplt(i, palette[i]);
-	}
 	
 	for(i=0; i < 25; i++)
 	{
@@ -118,17 +109,23 @@ void render_init()
 
 void playscreen_init()
 {
+	uchar i;
+	for(i=0; i<16;i++)
+	{
+		setplt(i, palette[i]);
+	}
+
 	setpg(GAMEPAGE,BGPAGE);
 	generate_background();
 	boxline(0,0, 255,211-8, 1, PSET);
 	
 	cpyv2v(0,0, 255,211, BGPAGE, 0,0, GAMEPAGE, PSET);
 	
+	setpg(GAMEPAGE,GAMEPAGE);
+	
 	write("Score:", SCORE_X, SCORE_Y);
 	write("Lives:", LIVES_X, LIVES_Y);
 
-	setpg(GAMEPAGE,GAMEPAGE);
-	
 	boxline (SHIELD_O_METER_X,SHIELD_O_METER_Y, 
 		 SHIELD_O_METER_X+63+2,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
 		 C_WHITE, PSET);
@@ -320,29 +317,7 @@ static void render_bullets()
 	}
 }
 
-void write_cent(char *string, unsigned int y)
-{
-	write(string, (255-(strlen(string)*FONT_W)) >> 1, y);
-}
-
-void write(char *string, unsigned int x, unsigned int y)
-{
-	unsigned char i,charnumber,sx,sy;
-	
-	for (i=0; i<strlen(string); i++)
-	{
-		if (string[i]>=32 && string[i]<=127)
-		{
-			charnumber=(string[i]-32);
-			sx=(charnumber%FONT_CPL)*FONT_W;
-			sy=FONT_Y+(charnumber/FONT_CPL)*FONT_H;
-			cpyv2v(sx, sy, sx+FONT_W-1, sy+FONT_H-1, GFXPAGE,
-					x+i*FONT_W, y, GAMEPAGE, PSET);
-		}
-	}
-}
-					
-static void render_info(char noflives)
+void render_info(char noflives)
 {
 	char shield_stat = the_ship.shield_energy >> 2;
 	char str[7+6];

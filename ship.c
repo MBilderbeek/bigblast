@@ -1,4 +1,4 @@
-/* $Id: ship.c,v 1.3 2002/12/26 17:04:00 manuel Exp $
+/* $Id: ship.c,v 1.4 2002/12/26 23:54:11 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -60,24 +60,25 @@ heading_table_t heading2dxdy =
  * EXTERNAL FUNCTIONS
  */
 
-void ship_reset()
+void ship_init()
 {
+	the_ship.ship_obj = object_create (OBJ_MAX_X / 2, OBJ_MAX_Y / 2, 
+				0, 0, OBJ_SHIP);
 	the_ship.heading = 3 * MAX_HEADING / 4;
 	the_ship.heading_prev = -1;
 	the_ship.shield_energy = MAX_SHIELD_ENERGY;
 	the_ship.shield_state = OFF;
 }
 
-void ship_init()
-{
-	the_ship.ship_obj = object_create (OBJ_MAX_X / 2, OBJ_MAX_Y / 2, 
-				0, 0, OBJ_SHIP);
-	ship_reset();
-}
-
 void ship_destroy()
 {
 	object_destroy(&(the_ship.ship_obj));
+}
+
+void ship_reset()
+{
+	ship_destroy();
+	ship_init();
 }
 
 void ship_rotate(rotdir_t direction)

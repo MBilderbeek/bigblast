@@ -1,7 +1,8 @@
-$Id: ChangeLog,v 1.8 2002/12/26 17:04:00 manuel Exp $
+$Id: ChangeLog,v 1.9 2002/12/26 23:54:11 manuel Exp $
 
 2002/12/27 Manuel & Eric
 	* Made preparations to add levels. Already fake levels are working.
+	* Made a title screen with menu (and that includes a lot of changes)
 
 2002/11/29 Manuel & Eric
 	* Debris directions are now 45 degrees from original direction

@@ -1,4 +1,4 @@
-/* $Id: asteroid.c,v 1.6 2002/11/28 23:21:14 manuel Exp $
+/* $Id: asteroid.c,v 1.7 2002/12/26 23:54:11 manuel Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -35,6 +35,7 @@ void asteroids_init()
 		the_asteroids[i].size = AST_NONE;
 		the_asteroids[i].asteroid_obj = OBJ_VOID;
 	}
+	nof_asteroids=0;
 }
 
 void asteroids_move()

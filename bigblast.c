@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.9 2002/12/26 17:04:00 manuel Exp $
+/* $Id: bigblast.c,v 1.10 2002/12/26 23:54:11 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -10,25 +10,30 @@
  * INCLUDES
  */
 #include "stdlib.h"
+#include "msxbios.h"
 #include "renderer.h"
 #include "object.h"
 #include "ship.h"
 #include "asteroid.h"
 #include "collisio.h"
 #include "scores.h"
-//#include "msxbios.h"
+#include "font.h"
+#include "menu.h"
+#include "controls.h"
 
 /*
  * LOCAL DEFINITIONS
  */
 #define MSG_BASE 60
 #define MSG_BONUS_BASE 80
+#define MENU_BASE_X 100
+#define MENU_BASE_Y 150 
 
 int *JIFFY = (int *)0xFC9E;
 unsigned int score;
 unsigned char level;
 static char quit=0;
-static char noflives=9;
+static char noflives;
 
 static int get_rnd_coord(int range)
 {
@@ -71,11 +76,13 @@ static void add_bonus(unsigned char level, unsigned char noflives)
 	score+=lifebonus;
 	sprintf(string,"Life bonus: %d", lifebonus);
 	write_cent(string, MSG_BONUS_BASE + 40);
+
+	render_info(noflives);
 }
 
 void play_level(char level)
 {
-	int fire = 0;
+	onoff_t fire = OFF;
 	int i;
 	ast_hdl_t a=0;
 	char string[100];
@@ -83,16 +90,6 @@ void play_level(char level)
 	onoff_t boost=OFF;
 	onoff_t shield=OFF;
 	rotdir_t rotdir=ROT_NONE;
-	
-	for (i=0; i<2+level; i++) // Actually: load level data or so
-	{
-		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
-				       get_rnd_coord(OBJ_MAX_Y), AST_BIG);
-		object_accel(the_asteroids[a].asteroid_obj,
-			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
-			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
-			  
-	}
 	
 	frame_counter = 0;    
 	
@@ -104,7 +101,21 @@ void play_level(char level)
 
 	playscreen_init();
 
-	ship_reset();
+	objects_init();
+	ship_init();
+	
+	bullets_init();
+	asteroids_init();
+	
+	for (i=0; i<2+level; i++) // Actually: load level data or so
+	{
+		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
+				       get_rnd_coord(OBJ_MAX_Y), AST_BIG);
+		object_accel(the_asteroids[a].asteroid_obj,
+			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
+			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
+			  
+	}
 	
 	while (!quit && noflives!=0 && nof_asteroids>0)
 	{
@@ -119,30 +130,63 @@ void play_level(char level)
 		ship_shield_set(shield);
 		if (object_get_state(the_ship.ship_obj)==DYING)
 		{
-			ship_destroy();
+			ship_reset();
 			boost=OFF;
-			ship_init();
 		}
-		if (ship_hit(shield))
+		else if (ship_hit(shield))
 		{
 			beep(); // explosion function should be here
 			noflives--;
 		}	
 		if (fire) bullet_fire();
-		check_quit(&quit);
+		quit=check_quit();
 	}
-	render_frame(boost, shield, noflives); // update noflives on screen
+	render_info(noflives); // update noflives on screen
 	if (nof_asteroids==0)
 	{
 		add_bonus(level, noflives);
 		sprintf(string,"Wave %d completed!",level);
 		write_cent(string, MSG_BASE);
-
+		*JIFFY = 0;
+		while (*JIFFY<100);
 		kilbuf();
-		while (!kbhit());
+		while (!chsns());
 		kilbuf();
 	}
 
+}
+
+void play_game()
+{
+	char string[100];
+	
+	score = 0;
+	level = 0;
+	noflives=5;
+
+	while (!quit && noflives>0)
+	{
+		play_level(++level);
+	}
+
+	if (noflives==0) // This means that !quit==TRUE implicitly
+	{
+		sprintf(string,"Game over!");
+		write_cent(string, MSG_BASE);
+	
+		sprintf(string,"Total score: %d points", score);
+		write_cent(string, MSG_BASE+80);
+
+		sprintf(string,"You reached wave %d", level);
+		write_cent(string, MSG_BASE+100);
+	
+		*JIFFY = 0;
+		while (*JIFFY<100);
+	
+		kilbuf();
+		while (!chsns());
+		kilbuf();
+	}
 }
 
 void main ()
@@ -157,39 +201,21 @@ void main ()
 
 	render_init();
 
-	objects_init();
-	ship_init();
-	bullets_init();
-	asteroids_init();
-	
-	score = 0;
+	do
+	{
+		cls();
+		sprintf(string,"Welcome to Big Blast!");
+		write_cent(string, MSG_BASE);
+		init_menu();
+		switch (menu_select())
+		{
+			case PLAY: play_game();	quit=0; break;
+		 	case QUIT: quit=1; break;
+		 	default: ;
+		}
+	}
+	while (!quit);
 		
-	level = 0;
-	
-	while (!quit && noflives>0)
-	{
-		play_level(++level);
-	}
-
-	if (noflives==0)
-	{
-		sprintf(string,"Game over! You lost! (Sucker!)");
-	}
-	else
-		sprintf(string,"Chickening out, eh!? Whimp!");
-	
-	write_cent(string, MSG_BASE);
-	
-	sprintf(string,"Total score: %d points", score);
-	write_cent(string, MSG_BASE+80);
-
-	sprintf(string,"You reached wave %d", level);
-	write_cent(string, MSG_BASE+100);
-
-	kilbuf();
-	while (!kbhit());
-	
-	kilbuf();
 	screen(0);
 	*CLICKSW=clicksw_old;
 }

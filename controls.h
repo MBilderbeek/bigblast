@@ -1,4 +1,4 @@
-/* $Id: controls.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: controls.h,v 1.3 2002/12/26 23:54:11 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -18,7 +18,7 @@
  * EXTERNAL FUNCTIONS
  */
 
-extern void check_quit(char *quit);
+extern char check_quit();
 
 extern void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *fire);
 #endif

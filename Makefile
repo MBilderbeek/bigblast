@@ -15,7 +15,9 @@ OBJECTS=bigblast.o \
 	bullet.o \
 	object.o \
 	controls.o \
-	collisio.o
+	collisio.o \
+	font.o \
+	menu.o
 
 all: emutest
 
