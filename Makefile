@@ -13,6 +13,7 @@ OBJECTS=bigblast.o \
 	ship.o \
 	asteroid.o \
 	bullet.o \
+	explosio.o \
 	object.o \
 	controls.o \
 	collisio.o \

@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.10 2002/12/26 23:54:11 manuel Exp $
+/* $Id: bigblast.c,v 1.11 2003/02/07 01:38:46 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -15,6 +15,7 @@
 #include "object.h"
 #include "ship.h"
 #include "asteroid.h"
+#include "explosio.h"
 #include "collisio.h"
 #include "scores.h"
 #include "font.h"
@@ -106,6 +107,7 @@ void play_level(char level)
 	
 	bullets_init();
 	asteroids_init();
+	explosions_init();
 	
 	for (i=0; i<2+level; i++) // Actually: load level data or so
 	{
@@ -126,6 +128,7 @@ void play_level(char level)
 		ship_move(); // en schiet op een beetje!
 		asteroids_move();
 		bullets_move();
+		explosions_move();
 		bullets_n_asteroids();
 		ship_shield_set(shield);
 		if (object_get_state(the_ship.ship_obj)==DYING)

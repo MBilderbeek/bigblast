@@ -1,4 +1,9 @@
-$Id: ChangeLog,v 1.12 2003/01/16 23:28:31 manuel Exp $
+$Id: ChangeLog,v 1.13 2003/02/07 01:38:46 manuel Exp $
+
+2003/02/07 Eric & Manuel
+	* Explosions added
+	* Momentum effect from bullets on ship (thanks, Newton!)
+	* Asteroids have their own animation phase
 
 2003/01/13 Eric
 	* Optimizations in the renderer - smaller asteroids, smaller COPYs

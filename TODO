@@ -1,7 +1,8 @@
-- weghalen van asteroids moet afhangen van hun size!
+- optimalisatie: hou aantal astroids/kogels/explosies bij zodat als je ze
+  allemaal gehad hebt je niet meer hoeft te zoeken
 - beetje: beter asteroids kunnen raken met kogels (dia tuning)
 - er gaat misschien iets mis bij het bepalen van de snelheid van het debris
 - echtere levels
 - andere vijanden
-- echte explosies
+- echtere explosies, vooral de gfx
 - eventuele optimalisaties van het e.e.a., vooral de collisiondetection

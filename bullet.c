@@ -1,4 +1,4 @@
-/* $Id: bullet.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: bullet.c,v 1.3 2003/02/07 01:38:46 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -76,6 +76,7 @@ void bullet_fire()
 			the_bullets[i].bullet_obj = 
 				object_create (x, y, dx, dy, OBJ_BULLET);
 			the_bullets[i].age = NEW_BULLET_AGE;
+			object_accel(the_ship.ship_obj, -(dx>>5), -(dy>>5));
 			i = MAX_NOF_BULLETS; /* get out of the for loop */
 		}
 	}

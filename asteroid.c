@@ -1,4 +1,4 @@
-/* $Id: asteroid.c,v 1.8 2003/01/03 19:23:52 eric Exp $
+/* $Id: asteroid.c,v 1.9 2003/02/07 01:38:46 manuel Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -13,6 +13,7 @@
 #include "stdlib.h"
 #include "object.h"
 #include "asteroid.h"
+#include "explosio.h"
 
 /*
  * LOCAL DEFINITIONS
@@ -93,5 +94,9 @@ void asteroid_destroy(ast_hdl_t ast)
 	object_destroy(&(the_asteroids[ast].asteroid_obj));
 	the_asteroids[ast].size = AST_NONE;
 	nof_asteroids--;
+
+	// explode! HAHAHAHAAAAA!
+	
+	explosion_create(x, y, (expsize_e) size, dx, dy);
 }
 

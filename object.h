@@ -1,4 +1,4 @@
-/* $Id: object.h,v 1.3 2002/11/21 23:46:58 manuel Exp $
+/* $Id: object.h,v 1.4 2003/02/07 01:38:46 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -32,7 +32,8 @@ typedef enum
 	OBJ_UNUSED,
 	OBJ_SHIP,
 	OBJ_BULLET,
-	OBJ_AST
+	OBJ_AST,
+	OBJ_EXP
 } object_e;
 
 typedef enum
