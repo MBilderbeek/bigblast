@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.20 2003/02/20 22:57:27 manuel Exp $
+/* $Id: renderer.c,v 1.21 2003/03/01 22:56:57 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -13,6 +13,7 @@
 #include "stdlib.h"
 #include "glib.h"
 #include "ship.h"
+#include "ufo.h"
 #include "asteroid.h"
 #include "bullet.h"
 #include "explosio.h"
@@ -29,17 +30,31 @@
 
 #define BOOST_OFFSET 32
 
-#define AST_SX_BIG 0
-#define AST_SX_MEDIUM (4*AST_TILE_SIZE)
-#define AST_SX_SMALL (8*AST_TILE_SIZE)
-#define AST_SY (4*SHIP_TILE_SIZE)
-#define EXP_SX_BIG 0
-#define EXP_SX_MEDIUM (8*EXP_TILE_SIZE)
-#define EXP_SX_SMALL (EXP_SX_BIG)
-#define EXP_SY (6*SHIP_TILE_SIZE)
-#define SHIELD_SY (5*SHIP_TILE_SIZE)
-#define BGPAGE  3
+#define AST_SX_BIG      0
+#define AST_SY_BIG     64
+#define AST_SX_MEDIUM 128
+#define AST_SY_MEDIUM  64
+#define AST_SX_SMALL    0
+#define AST_SY_SMALL   80
+#define AST_SX_STEEL  128
+#define AST_SY_STEEL   80
+
+#define EXP_SX_BIG      0
+#define EXP_SY_BIG     96
+#define EXP_SX_MEDIUM 128
+#define EXP_SY_MEDIUM  96
+#define EXP_SX_SMALL    0
+#define EXP_SY_SMALL  112
+
+#define SHIELD_SX     128
+#define SHIELD_SY     112
+
+#define UFO_SX          0
+#define UFO_SY        128
+
 #define GAMEPAGE 0
+#define BGPAGE  3
+
 // GFXPAGE: see renderer.h
 
 #define SCORE_Y (212-FONT_H+1) // go to the edge; compensate for empty line
@@ -53,35 +68,33 @@
 
 #define	C_TRANSP 0
 #define C_BLACK 1
-#define	C_SHIELD1 2
-#define	C_SHIELD2 3
-#define	C_SHIELD3 4
 #define	C_SHIELD_O_METER 14
 #define	C_WHITE 15
 
 static int palette[] = 
 {	/*-GRB*/
 	0x0000,
-	0x0111, /* 1: black    */
-	0x0707, /* 2: shield 1 */
-	0x0404, /* 3: shield 2 */
-	0x0202, /* 4: shield 3 */
-	0x0333, /* 5:          */
-	0x0070, /* 6:          */
-	0x0527, /* 7:          */
-	0x0527, /* 8:          */
-	0x0572, /* 9:          */
-	0x0333, /*10:          */
-	0x0333, /*11:          */
-	0x0333, /*12:          */
-	0x0333, /*13:          */
-	0x0117, /*14:          */
-	0x0777  /*15:          */
+	0x0000, /* 1: black                    */
+	0x0330, /* 2:                          */
+	0x0330, /* 3:                          */
+	0x0337, /* 4:                          */
+	0x0330, /* 5:                          */
+	0x0330, /* 6:                          */
+	0x0330, /* 7:                          */
+	0x0771, /* 8: yellow    ufo            */
+	0x0107, /* 9: d blue    shield         */
+	0x0327, /*10: l blue    shield         */
+	0x0664, /*11: l yellow  explosion/ufo  */
+	0x0222, /*12: d grey    all            */
+	0x0333, /*13: m grey    all            */
+	0x0555, /*14: l grey    all            */
+	0x0777  /*15: white     all            */
 };
 
 extern void loadgrp(char *filename, unsigned int x, unsigned char y, char page);
 
 static void render_ship(onoff_t boost, onoff_t shield);
+static void render_ufo();
 static void render_asteroids();
 static void render_explosions();
 static void render_bullets();
@@ -172,6 +185,7 @@ void render_frame(onoff_t boost, onoff_t shield, char noflives)
 	*Timer=0;
 	frame_counter++;
 	if (the_ship.ship_obj!=OBJ_VOID) render_ship(boost, shield);
+	render_ufo();
 	render_asteroids();
 	render_bullets();
 	render_explosions();
@@ -183,7 +197,7 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	int sx, sy;
 	int dx, dy;
 	int dx_prev, dy_prev;
-	int anim_step = (frame_counter % 4);
+	int anim_step = (frame_counter % 8);
 	int tilesize;
 	obj_hdl_t ship_obj = the_ship.ship_obj;
 	
@@ -221,7 +235,7 @@ static void render_ship(onoff_t boost, onoff_t shield)
 			       dx, dy, GAMEPAGE, TPSET);
 			if(shield)
 			{
-				sx = SHIELD_TILE_SIZE * anim_step;
+				sx = SHIELD_SX + SHIELD_TILE_SIZE * anim_step;
 				cpyv2v(sx, SHIELD_SY,
 				       sx+SHIELD_TILE_SIZE-1,
 				         SHIELD_SY + SHIELD_TILE_SIZE - 1,
@@ -235,7 +249,7 @@ static void render_ship(onoff_t boost, onoff_t shield)
 static void render_asteroids()
 {
 	char i;
-	int sx = 0;
+	int sx = 0, sy;
 	int dx, dy;
 	int dx_prev, dy_prev;
 	int x_cur, y_cur;
@@ -279,26 +293,35 @@ static void render_asteroids()
 				{
 					switch (the_asteroids[i].size)
 					{
-						case AST_BIG:
+					case AST_BIG:
+						if (the_asteroids[i].steel)
+						{
+							sx=AST_SX_STEEL;
+							sy=AST_SY_STEEL;
+						} else {
 							sx=AST_SX_BIG;
-							break;
-				 		case AST_MEDIUM:
-							sx=AST_SX_MEDIUM;
-							break;
-						case AST_SMALL:
-							sx=AST_SX_SMALL;
-							break;
-						default:
-							break;
+							sy=AST_SY_BIG;
+						}
+						break;
+				 	case AST_MEDIUM:
+						sx=AST_SX_MEDIUM;
+						sy=AST_SY_MEDIUM;
+						break;
+					case AST_SMALL:
+						sx=AST_SX_SMALL;
+						sy=AST_SY_SMALL;
+						break;
+					default:
+						break;
 					}
-					animstep=(animstep+i)%4; // variation
+					animstep=(animstep+i)%8; // variation
 					offset = (AST_TILE_SIZE - tilesize)>>1;
 					sx += animstep*AST_TILE_SIZE + offset;
+					sy += offset;
 					dx = OBJ2GFX( x_cur );
 					dy = OBJ2GFX( y_cur );
-					offset += AST_SY;
-					cpyv2v(sx, offset, 
-					       sx+tilesize, offset+tilesize,
+					cpyv2v(sx, sy, 
+					       sx+tilesize, sy+tilesize,
 					       GFXPAGE,
 					       dx, dy, GAMEPAGE, TPSET);
 				}
@@ -355,7 +378,7 @@ static void render_bullets()
 static void render_explosions()
 {
 	char i;
-	int sx = 0;
+	int sx = 0, sy;
 	int dx, dy;
 	int dx_prev, dy_prev;
 	int x_cur, y_cur;
@@ -397,27 +420,30 @@ static void render_explosions()
 				{
 					switch (the_explosions[i].size)
 					{
-						case EXP_BIG:
-							sx = EXP_SX_BIG;
-							break;
-				 		case EXP_MEDIUM:
-							sx = EXP_SX_MEDIUM;
-							break;
-						case EXP_SMALL:
-							sx = EXP_SX_SMALL;
-							break;
-						default:
-							break;
+					case EXP_BIG:
+						sx = EXP_SX_BIG;
+						sy = EXP_SY_BIG;
+						break;
+				 	case EXP_MEDIUM:
+						sx = EXP_SX_MEDIUM;
+						sy = EXP_SY_MEDIUM;
+						break;
+					case EXP_SMALL:
+						sx = EXP_SX_SMALL;
+						sy = EXP_SY_SMALL;
+						break;
+					default:
+						break;
 					}
 					animstep= NEW_EXPLOSION_AGE
 						  - the_explosions[i].age;
 					offset = (EXP_TILE_SIZE - tilesize)>>1;
 					sx += animstep*EXP_TILE_SIZE + offset;
+					sy += offset;
 					dx = OBJ2GFX( x_cur );
 					dy = OBJ2GFX( y_cur );
-					offset += EXP_SY;
-					cpyv2v(sx, offset,
-					       sx+tilesize, offset+tilesize,
+					cpyv2v(sx, sy,
+					       sx+tilesize, sy+tilesize,
 					       GFXPAGE,
 					       dx, dy, GAMEPAGE, TPSET);
 				}
@@ -426,6 +452,49 @@ static void render_explosions()
 	}
 }
 
+
+static void render_ufo ()
+{
+	int sx, sy;
+	int dx, dy;
+	int x_cur, y_cur;
+	int x_prev, y_prev;
+	int tilesize;
+	state_e state;
+	
+	int anim_step = frame_counter % 4;
+	obj_hdl_t ufo_obj = the_ufo.ufo_obj;
+
+	if ( ufo_obj != OBJ_VOID )
+	{
+		x_cur = object_get_x(ufo_obj);
+		y_cur = object_get_y(ufo_obj);
+		x_prev = object_get_x_prev(ufo_obj);
+		y_prev = object_get_y_prev(ufo_obj);
+		if ( x_cur != x_prev || y_cur != y_prev )
+		{
+			tilesize = OBJ2GFX(object_get_size(ufo_obj)) - 1;
+			dx = OBJ2GFX(x_prev);
+			dy = OBJ2GFX(y_prev);
+			cpyv2v(dx,dy, dx+tilesize, dy+tilesize, BGPAGE,
+			       dx,dy, GAMEPAGE, PSET);
+
+			state = object_get_state(ufo_obj);
+			if(state != DYING)
+			{
+				dx = OBJ2GFX(x_cur);
+				dy = OBJ2GFX(y_cur);
+				sx = UFO_SX + anim_step * (tilesize + 1);
+				sy = UFO_SY;
+				cpyv2v(sx, sy, sx + tilesize, sy + tilesize,
+					GFXPAGE,
+				       dx, dy, GAMEPAGE, TPSET);
+			}
+		}
+	}
+}
+
+			
 void render_info(char noflives)
 {
 	char shield_stat = the_ship.shield_energy >> 2;

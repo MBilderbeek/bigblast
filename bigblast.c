@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.17 2003/02/28 00:24:34 manuel Exp $
+/* $Id: bigblast.c,v 1.18 2003/03/01 22:56:57 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -14,6 +14,7 @@
 #include "renderer.h"
 #include "object.h"
 #include "ship.h"
+#include "ufo.h"
 #include "asteroid.h"
 #include "bullet.h"
 #include "explosio.h"
@@ -110,6 +111,7 @@ void play_level(char level)
 	objects_init();
 	ship_init();
 	
+	ufo_init();
 	bullets_init();
 	asteroids_init();
 	explosions_init();
@@ -123,6 +125,7 @@ void play_level(char level)
 			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
 			  
 	}
+	ufo_create(0,0);
 	
 	while (!quit && not_finished)
 	{
@@ -163,6 +166,7 @@ void play_level(char level)
 				ship_init();
 			}
 		}	
+		ufo_move();
 		asteroids_move();
 		bullets_move();
 		explosions_move();

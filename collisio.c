@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.12 2003/02/28 00:24:34 manuel Exp $
+/* $Id: collisio.c,v 1.13 2003/03/01 22:56:57 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -52,7 +52,7 @@ char ship_hit(void)
 	char      ship_dx;
 	char      ship_dy;
 	obj_hdl_t ast_obj;
-	astsize_e ast_size;
+	int       weight;
 	int       ast_x, ast_y;
 	int       delta_x, delta_y, delta_dia;
 	char      counter = 0;
@@ -85,12 +85,13 @@ char ship_hit(void)
 						  - ship_dx;
 					delta_y = object_get_dy(ast_obj)
 						  - ship_dy;
-					ast_size = the_asteroids[i].size;
+					weight = AST_BIG
+						 - the_asteroids[i].size;
 
 					/* ship gets (part of) ast's momentum */
 					object_accel(the_ship.ship_obj,
-						   delta_x >> (3 - ast_size),
-						   delta_y >> (3 - ast_size));
+						   delta_x >> weight,
+						   delta_y >> weight);
 
 					/* ast loses (part of) its momentum */
 					// But this looks unnatural since it is
@@ -104,8 +105,8 @@ char ship_hit(void)
 					    object_set_state(ast_obj, DYING);
 					else
 						object_accel(ast_obj,
-						    -(delta_x >> (4-ast_size)),
-						    -(delta_y >> (4-ast_size)));
+						    -(delta_x >> weight),
+						    -(delta_y >> weight));
 						
 					hit = 1;
 				}

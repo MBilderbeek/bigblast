@@ -11,6 +11,7 @@ EMUDISK=-diska
 OBJECTS=bigblast.o \
         renderer.o \
 	ship.o \
+	ufo.o \
 	asteroid.o \
 	bullet.o \
 	explosio.o \
