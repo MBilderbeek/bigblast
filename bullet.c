@@ -1,4 +1,4 @@
-/* $Id: bullet.c,v 1.3 2003/02/07 01:38:46 manuel Exp $
+/* $Id: bullet.c,v 1.4 2003/02/14 17:52:28 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -23,6 +23,7 @@
 #define BULLET_SPEED(x) ((x) * 7)
 
 bullet_t the_bullets[MAX_NOF_BULLETS];
+int nof_bullets;
 
 /*
  * EXTERNAL FUNCTIONS
@@ -36,6 +37,7 @@ void bullets_init()
 	{
 		the_bullets[i].age = 0;
 		the_bullets[i].bullet_obj = OBJ_VOID;
+		nof_bullets=0;
 	}
 }
 
@@ -54,7 +56,10 @@ void bullets_move()
 						 DYING);
 		}
 		else if (object_get_state(the_bullets[i].bullet_obj) == DYING)
+		{
 			object_destroy(&(the_bullets[i].bullet_obj));
+			nof_bullets--;
+		}
 	}
 }
 
@@ -76,6 +81,7 @@ void bullet_fire()
 			the_bullets[i].bullet_obj = 
 				object_create (x, y, dx, dy, OBJ_BULLET);
 			the_bullets[i].age = NEW_BULLET_AGE;
+			nof_bullets++;
 			object_accel(the_ship.ship_obj, -(dx>>5), -(dy>>5));
 			i = MAX_NOF_BULLETS; /* get out of the for loop */
 		}

@@ -1,4 +1,4 @@
-/* $Id: controls.c,v 1.6 2002/12/26 23:54:11 manuel Exp $
+/* $Id: controls.c,v 1.7 2003/02/14 17:52:28 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -22,6 +22,8 @@
 #define NEWKEY 0xFBE5
 
 #define CHECK_KEYBMX(row, col)  !(*((char *)(NEWKEY + row)) & (1<<col))
+
+#define CHECK_KEYROW(row) ~(*((char *)(NEWKEY + row)))
 
 #define ESC_PRESSED CHECK_KEYBMX(7,2)
 #define SHIFT_PRESSED CHECK_KEYBMX(6,0)
@@ -62,3 +64,12 @@ void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *
 	*shield=(SHIFT_PRESSED || the_ship.shield_energy > AUTOSHIELD_THRESHOLD) 
 			&& the_ship.shield_energy > 0;
 }
+
+char keypressed()
+{
+	char pressed=0;
+	char row;
+	for (row=0; row<11; row++)
+		pressed |= CHECK_KEYROW(row);
+	return(pressed);
+}	

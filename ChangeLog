@@ -1,4 +1,9 @@
-$Id: ChangeLog,v 1.14 2003/02/14 00:17:15 manuel Exp $
+$Id: ChangeLog,v 1.15 2003/02/14 17:52:28 eric Exp $
+
+2003/02/14 Eric & Manuel
+	* Level finished fine tuned
+	* Proper checking for pressed keys
+	* Explosions work 100% now
 
 2003/02/14 Eric & Manuel
 	* Explosions fine tuned (New and Improved!)

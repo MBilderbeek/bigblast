@@ -1,4 +1,4 @@
-/* $Id: bullet.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: bullet.h,v 1.3 2003/02/14 17:52:28 eric Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -32,6 +32,7 @@ typedef struct
 } bullet_t;
 	
 extern bullet_t the_bullets[MAX_NOF_BULLETS];
+extern int nof_bullets;
 
 /*
  * EXTERNAL FUNCTIONS

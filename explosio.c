@@ -1,4 +1,4 @@
-/* $Id: explosio.c,v 1.1 2003/02/07 01:38:46 manuel Exp $
+/* $Id: explosio.c,v 1.2 2003/02/14 17:52:28 eric Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -19,6 +19,7 @@
  */
 
 explosion_t the_explosions[MAX_NOF_EXPLOSIONS];
+char nof_explosions;
 
 /*
  * EXTERNAL FUNCTIONS
@@ -34,7 +35,7 @@ void explosions_init()
 		the_explosions[i].age = 0;		
 		the_explosions[i].explosion_obj = OBJ_VOID;
 	}
-	//nof_explosions=0;
+	nof_explosions=0;
 }
 
 void explosions_move()
@@ -52,7 +53,7 @@ void explosions_move()
 						 DYING);
 		}
 		else if (object_get_state(the_explosions[i].explosion_obj) == DYING)
-			object_destroy(&(the_explosions[i].explosion_obj));
+			explosion_destroy(i);
 	}
 }
 
@@ -68,6 +69,7 @@ exp_hdl_t explosion_create(int x, int y, expsize_e size, int dx, int dy)
 				object_create (x, y, dx, dy, OBJ_EXP);
 			the_explosions[i].size = size;
 			the_explosions[i].age = NEW_EXPLOSION_AGE;
+			nof_explosions++;
 			break;
 		}
 	}
@@ -81,5 +83,6 @@ void explosion_destroy(exp_hdl_t exp)
 {
 	object_destroy(&(the_explosions[exp].explosion_obj));
 	the_explosions[exp].size = EXP_NONE;
+	nof_explosions--;
 }
 

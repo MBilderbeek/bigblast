@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.12 2003/02/14 00:17:15 manuel Exp $
+/* $Id: bigblast.c,v 1.13 2003/02/14 17:52:28 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -15,6 +15,7 @@
 #include "object.h"
 #include "ship.h"
 #include "asteroid.h"
+#include "bullet.h"
 #include "explosio.h"
 #include "collisio.h"
 #include "scores.h"
@@ -84,10 +85,11 @@ static void add_bonus(unsigned char level, unsigned char noflives)
 void play_level(char level)
 {
 	onoff_t fire = OFF;
-	int i, shipkaboom=0;
+	int i;
 	ast_hdl_t a=0;
 	char string[100];
-	
+	char not_finished = 1;
+
 	onoff_t boost=OFF;
 	onoff_t shield=OFF;
 	rotdir_t rotdir=ROT_NONE;
@@ -109,7 +111,7 @@ void play_level(char level)
 	asteroids_init();
 	explosions_init();
 	
-	for (i=0; i<2+level; i++) // Actually: load level data or so
+	for (i=0; i<0+level; i++) // Actually: load level data or so
 	{
 		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
 				       get_rnd_coord(OBJ_MAX_Y), AST_BIG);
@@ -119,7 +121,7 @@ void play_level(char level)
 			  
 	}
 	
-	while (!quit && noflives!=0 && nof_asteroids>0)
+	while (!quit && noflives!=0 && not_finished)
 	{
 		render_frame(boost, shield, noflives);
 		bullets_n_asteroids();
@@ -130,12 +132,11 @@ void play_level(char level)
 			if (boost==ON) ship_accel();
 			ship_move(); // en schiet op een beetje!
 			ship_shield_set(shield);
-			if (fire) bullet_fire();
+			if (fire && nof_asteroids) bullet_fire();
 			if (object_get_state(the_ship.ship_obj)==DYING)
 			{
 				ship_destroy();
 				boost=OFF;
-				shipkaboom=8;
 			}
 			else if (ship_hit() && (!shield))
 			{
@@ -144,9 +145,13 @@ void play_level(char level)
 		}
 		else
 		{
-			if (!(shipkaboom--) && (--noflives)) 
+			if ((!nof_bullets)&&(!nof_explosions) && (--noflives)) 
+			{
 				ship_init();
+			}
 		}	
+		not_finished=(nof_explosions || nof_bullets || nof_asteroids);
+	
 		asteroids_move();
 		bullets_move();
 		explosions_move();
@@ -160,9 +165,7 @@ void play_level(char level)
 		write_cent(string, MSG_BASE);
 		*JIFFY = 0;
 		while (*JIFFY<100);
-		kilbuf();
-		while (!chsns());
-		kilbuf();
+		while (!keypressed());
 	}
 
 }
@@ -170,7 +173,6 @@ void play_level(char level)
 void play_game()
 {
 	char string[100];
-	
 	score = 0;
 	level = 0;
 	noflives=5;
@@ -194,9 +196,7 @@ void play_game()
 		*JIFFY = 0;
 		while (*JIFFY<100);
 	
-		kilbuf();
-		while (!chsns());
-		kilbuf();
+		while (!keypressed());
 	}
 }
 
@@ -218,6 +218,7 @@ void main ()
 		sprintf(string,"Welcome to Big Blast!");
 		write_cent(string, MSG_BASE);
 		init_menu();
+		while (keypressed());
 		switch (menu_select())
 		{
 			case PLAY: play_game();	quit=0; break;
@@ -226,7 +227,7 @@ void main ()
 		}
 	}
 	while (!quit);
-		
 	screen(0);
 	*CLICKSW=clicksw_old;
+	kilbuf();	
 }

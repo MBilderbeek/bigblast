@@ -1,7 +1,6 @@
 - optimalisatie: hou aantal astroids/kogels/explosies bij zodat als je ze
   allemaal gehad hebt je niet meer hoeft te zoeken
 - beetje: beter asteroids kunnen raken met kogels (dia tuning)
-- end of level finetunen (uitrenderen)
 - echtere levels
 - andere vijanden
 - eventuele optimalisaties van het e.e.a., vooral de collisiondetection

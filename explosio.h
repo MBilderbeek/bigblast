@@ -1,4 +1,4 @@
-/* $Id: explosio.h,v 1.1 2003/02/07 01:38:46 manuel Exp $
+/* $Id: explosio.h,v 1.2 2003/02/14 17:52:28 eric Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -23,6 +23,7 @@
 #define NEW_EXPLOSION_AGE 8
 
 typedef char exp_hdl_t;
+extern char nof_explosions;
 
 /*
  * TYPE DEFINITIONS
