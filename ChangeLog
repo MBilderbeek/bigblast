@@ -1,4 +1,12 @@
-$Id: ChangeLog,v 1.23 2003/03/20 23:47:31 manuel Exp $
+$Id: ChangeLog,v 1.24 2003/03/21 11:29:01 manuel Exp $
+
+2003/03/21 Manuel
+	* Several small fixes:
+	  - random seed is now given after pressing space bar (better random)
+	  - UFOs and asteroids are now also rendered when they have the same
+	    coordinate as in the previous frame (which is a very rare case),
+	    to prevent corruption of those graphics on screen
+	* Continuing to attempt to fix tinkeroid bug (it works *often* now)
 
 2003/03/21 Eric & Manuel
 	* Added high scores

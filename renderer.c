@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.22 2003/03/20 23:47:31 manuel Exp $
+/* $Id: renderer.c,v 1.23 2003/03/21 11:29:01 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -273,26 +273,22 @@ static void render_asteroids()
 					the_asteroids[i].asteroid_obj);
 
 
-			if ( (x_cur != x_prev) || (y_cur != y_prev) )
-			{
-				tilesize = OBJ2GFX(object_get_size(
-					      the_asteroids[i].asteroid_obj));
+			tilesize = OBJ2GFX(object_get_size(
+				      the_asteroids[i].asteroid_obj));
 
-				dx_prev = OBJ2GFX( x_prev );
-				dy_prev = OBJ2GFX( y_prev );
+			dx_prev = OBJ2GFX( x_prev );
+			dy_prev = OBJ2GFX( y_prev );
 
-				tilesize--;
-				cpyv2v(dx_prev, dy_prev, 
-				       dx_prev+tilesize, dy_prev+tilesize, 
-				       BGPAGE,
-				       dx_prev, dy_prev, GAMEPAGE, PSET);
+			tilesize--;
+			cpyv2v(dx_prev, dy_prev, 
+			       dx_prev+tilesize, dy_prev+tilesize, 
+			       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
 				
-				state = object_get_state(
-					   the_asteroids[i].asteroid_obj);
-				if(state != DYING)
+			state = object_get_state(the_asteroids[i].asteroid_obj);
+			if(state != DYING)
+			{
+				switch (the_asteroids[i].size)
 				{
-					switch (the_asteroids[i].size)
-					{
 					case AST_BIG:
 						if (the_asteroids[i].steel)
 						{
@@ -313,18 +309,15 @@ static void render_asteroids()
 						break;
 					default:
 						break;
-					}
-					animstep=(animstep+i)%8; // variation
-					offset = (AST_TILE_SIZE - tilesize)>>1;
-					sx += animstep*AST_TILE_SIZE + offset;
-					sy += offset;
-					dx = OBJ2GFX( x_cur );
-					dy = OBJ2GFX( y_cur );
-					cpyv2v(sx, sy, 
-					       sx+tilesize, sy+tilesize,
-					       GFXPAGE,
-					       dx, dy, GAMEPAGE, TPSET);
 				}
+				animstep=(animstep+i)%8; // variation
+				offset = (AST_TILE_SIZE - tilesize)>>1;
+				sx += animstep*AST_TILE_SIZE + offset;
+				sy += offset;
+				dx = OBJ2GFX( x_cur );
+				dy = OBJ2GFX( y_cur );
+				cpyv2v(sx, sy, sx+tilesize, sy+tilesize,
+				       GFXPAGE, dx, dy, GAMEPAGE, TPSET);
 			}
 		}
 	}
@@ -471,25 +464,21 @@ static void render_ufo ()
 		y_cur = object_get_y(ufo_obj);
 		x_prev = object_get_x_prev(ufo_obj);
 		y_prev = object_get_y_prev(ufo_obj);
-		if ( x_cur != x_prev || y_cur != y_prev )
-		{
-			tilesize = OBJ2GFX(object_get_size(ufo_obj)) - 1;
-			dx = OBJ2GFX(x_prev);
-			dy = OBJ2GFX(y_prev);
-			cpyv2v(dx,dy, dx+tilesize, dy+tilesize, BGPAGE,
-			       dx,dy, GAMEPAGE, PSET);
+		tilesize = OBJ2GFX(object_get_size(ufo_obj)) - 1;
+		dx = OBJ2GFX(x_prev);
+		dy = OBJ2GFX(y_prev);
+		cpyv2v(dx,dy, dx+tilesize, dy+tilesize, BGPAGE,
+		       dx,dy, GAMEPAGE, PSET);
 
-			state = object_get_state(ufo_obj);
-			if(state != DYING)
-			{
-				dx = OBJ2GFX(x_cur);
-				dy = OBJ2GFX(y_cur);
-				sx = UFO_SX + anim_step * (tilesize + 1);
-				sy = UFO_SY;
-				cpyv2v(sx, sy, sx + tilesize, sy + tilesize,
-					GFXPAGE,
-				       dx, dy, GAMEPAGE, TPSET);
-			}
+		state = object_get_state(ufo_obj);
+		if(state != DYING)
+		{
+			dx = OBJ2GFX(x_cur);
+			dy = OBJ2GFX(y_cur);
+			sx = UFO_SX + anim_step * (tilesize + 1);
+			sy = UFO_SY;
+			cpyv2v(sx, sy, sx + tilesize, sy + tilesize,
+				GFXPAGE, dx, dy, GAMEPAGE, TPSET);
 		}
 	}
 }

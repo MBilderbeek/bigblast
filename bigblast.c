@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.20 2003/03/20 23:47:31 manuel Exp $
+/* $Id: bigblast.c,v 1.21 2003/03/21 11:29:01 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -241,8 +241,6 @@ void main ()
 	char clicksw_old=*CLICKSW;
 	*CLICKSW=0;        
 
-	srand(*JIFFY);
-
 	render_init();
 
 	do
@@ -254,6 +252,7 @@ void main ()
 		write_cent(string, 212-10);
 		init_menu();
 		while (keypressed());
+		srand(*JIFFY); // now it is initialized at a random time
 		switch (menu_select())
 		{
 			case PLAY: play_game();	quit=0; break;

@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.15 2003/03/20 23:47:31 manuel Exp $
+/* $Id: collisio.c,v 1.16 2003/03/21 11:29:01 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -10,6 +10,7 @@
  * INCLUDES
  */
 
+#include <stdio.h>
 #include "glib.h"
 #include "object.h"
 #include "ship.h"
@@ -83,17 +84,20 @@ char ship_hit(void) // hip shit?
 				delta_dx = object_get_dx(ast_obj) - object_get_dx(ship_obj);
 				delta_dy = object_get_dy(ast_obj) - object_get_dy(ship_obj);
 
-				/* // attempting to fix a tinkeroid bug
+				// attempting to fix a tinkeroid bug FIXME
 				if (delta_dx==0 && delta_dy==0)
 				{
-					int dx=get_center_x(ast_obj)-get_center_x(ship_obj);
-					int dy=get_center_y(ast_obj)-get_center_y(ship_obj);
-				    int maxdist=(object_get_size(ast_obj)+object_get_size(ship_obj)) >> 1; //=dia1+dia2
-					//delta_dx=(dx<0)? (-maxdist-dx):(-maxdist+dx);
-					//delta_dy=(dy<0)? (-maxdist-dy):(-maxdist+dy);
-					if (dx!=0) delta_dx=-4*(maxdist/dx);
-					if (dy!=0) delta_dy=-4*(maxdist/dy);
-				}*/
+					int dx=OBJ2GFX(get_center_x(ast_obj)-get_center_x(ship_obj));
+					int dy=OBJ2GFX(get_center_y(ast_obj)-get_center_y(ship_obj));
+					//int r=sqrt(dx*dx+dy*dy);
+					int rsq=dx*dx+dy*dy;
+				    //int maxdist=(object_get_size(ast_obj)+object_get_size(ship_obj)) >> 1; //=dia1+dia2
+					//char *str;
+					delta_dx=GFX2OBJ((int)((float)800/(float)(rsq)));
+					delta_dy=GFX2OBJ((int)((float)800/(float)(rsq)));
+					//sprintf(str,"%d %d %d %d %d\n",delta_dx,delta_dy,dx,dy,rsq);
+					//write(str,0,0);
+				}
 					
 				weight = AST_BIG - the_asteroids[i].size;
 
