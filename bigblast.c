@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.23 2003/05/09 17:15:04 manuel Exp $
+/* $Id: bigblast.c,v 1.24 2003/05/29 21:56:46 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -122,7 +122,8 @@ void play_level(char level)
 	for (i=0; i<1+level; i++) // Actually: load level data or so
 	{
 		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
-				       get_rnd_coord(OBJ_MAX_Y), AST_BIG, i==0);
+				       get_rnd_coord(OBJ_MAX_Y), AST_BIG, 
+				       i==0 ? AST_TYPE_HOMING : AST_TYPE_NORMAL);
 		object_accel(the_asteroids[a].asteroid_obj,
 			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
 			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));

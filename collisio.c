@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.18 2003/05/09 17:15:04 manuel Exp $
+/* $Id: collisio.c,v 1.19 2003/05/29 21:56:46 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -96,7 +96,7 @@ char ship_hit(void) // hip shit?
 				/* ship gets (part of) ast's momentum */
 				object_accel(ship_obj, delta_dx >> weight, delta_dy >> weight);
 
-				if (!the_asteroids[i].steel)
+				if (the_asteroids[i].type==AST_TYPE_NORMAL)
 				    object_set_state(ast_obj, DYING); //destroy in bullets check
 				else
 					object_accel(ast_obj, 
@@ -211,7 +211,7 @@ void bullets_n_asteroids()
 			case ALIVE:
 			case NEW:
 				bullets_n_object(the_asteroids[i].asteroid_obj,
-						 the_asteroids[i].steel);
+						 the_asteroids[i].type!=AST_TYPE_NORMAL);
 				break;
 			default: break;
 			}

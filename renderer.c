@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.25 2003/05/09 17:15:04 manuel Exp $
+/* $Id: renderer.c,v 1.26 2003/05/29 21:56:46 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -283,7 +283,7 @@ static void render_asteroids()
 				switch (the_asteroids[i].size)
 				{
 					case AST_BIG:
-						if (the_asteroids[i].steel)
+						if (the_asteroids[i].type!=AST_TYPE_NORMAL)
 						{
 							sx=AST_SX_STEEL;
 							sy=AST_SY_STEEL;

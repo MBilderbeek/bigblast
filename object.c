@@ -1,4 +1,4 @@
-/* $Id: object.c,v 1.3 2003/02/16 15:34:01 eric Exp $
+/* $Id: object.c,v 1.4 2003/05/29 21:56:46 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -181,7 +181,7 @@ void object_accel(obj_hdl_t object, char ddx, char ddy)
 	the_object->dy = dy;
 }
 
-static char mysqrt(int n)
+char mysqrt(int n)
 {
 	int r, rn=n>>1;
 

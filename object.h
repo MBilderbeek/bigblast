@@ -1,4 +1,4 @@
-/* $Id: object.h,v 1.5 2003/02/16 15:34:01 eric Exp $
+/* $Id: object.h,v 1.6 2003/05/29 21:56:46 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -90,6 +90,8 @@ extern void object_set_state(obj_hdl_t object, state_e state);
 extern void object_move(obj_hdl_t object);
 
 extern void object_accel(obj_hdl_t object, char ddx, char ddy);
-	
+
+extern char mysqrt(int n);
+
 #endif
 
