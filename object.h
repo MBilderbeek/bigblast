@@ -1,4 +1,4 @@
-/* $Id: object.h,v 1.6 2003/05/29 21:56:46 manuel Exp $
+/* $Id: object.h,v 1.7 2004/01/25 21:49:20 eric Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -28,6 +28,7 @@
 #define OBJ_MAX_DXY    31
 
 #define OBJ_VOID       -1
+
 
 /*
  * TYPE DEFINITIONS
@@ -60,33 +61,42 @@ typedef struct
  */
 
 extern void objects_init (void);
-
 extern obj_hdl_t object_create(int x, int y, char dx, char dy, int size);
-
 extern void object_destroy(obj_hdl_t *object);
 
-extern int object_get_x(obj_hdl_t object);
+#ifdef USE_FUNCTIONS
+	extern int object_get_x(obj_hdl_t object);
+	extern int object_get_y(obj_hdl_t object);
+	extern void object_set_x(obj_hdl_t object, int x);
+	extern void object_set_y(obj_hdl_t object, int y);
+	extern int object_get_x_prev(obj_hdl_t object);
+	extern int object_get_y_prev(obj_hdl_t object);
+	extern int object_get_dx(obj_hdl_t object);
+	extern int object_get_dy(obj_hdl_t object);
+	extern int object_get_size(obj_hdl_t object);
+	extern state_e object_get_state(obj_hdl_t object);
+	extern void object_set_state(obj_hdl_t object, state_e state);
+#else
+	extern object_t objects[];
 
-extern int object_get_y(obj_hdl_t object);
-
-extern void object_set_x(obj_hdl_t object, int x);
-
-extern void object_set_y(obj_hdl_t object, int y);
-
-extern int object_get_x_prev(obj_hdl_t object);
-
-extern int object_get_y_prev(obj_hdl_t object);
-
-extern int object_get_dx(obj_hdl_t object);
-
-extern int object_get_dy(obj_hdl_t object);
-
-extern int object_get_size(obj_hdl_t object);
-
-extern state_e object_get_state(obj_hdl_t object);
-
-extern void object_set_state(obj_hdl_t object, state_e state);
-
+	#define object_get_x(obj)          (objects[obj].x)
+	#define object_get_y(obj)          (objects[obj].y)
+	#define object_get_x_prev(obj)     (objects[obj].x_prev)
+	#define object_get_y_prev(obj)     (objects[obj].y_prev)
+	#define object_get_dx(obj)         (objects[obj].dx)
+	#define object_get_dy(obj)         (objects[obj].dy)
+	#define object_get_size(obj)       (objects[obj].size)
+	#define object_get_state(obj)      (objects[obj].state)
+	
+	#define object_set_x(obj,X)        (objects[obj].x=(X))
+	#define object_set_y(obj,Y)        (objects[obj].y=(Y))
+	#define object_set_x_prev(obj,X)   (objects[obj].x_prev=(X))
+	#define object_set_y_prev(obj,Y)   (objects[obj].y_prev=(Y))
+	#define object_set_dx(obj,X)       (objects[obj].dx=(X))
+	#define object_set_dy(obj,Y)       (objects[obj].dy=(Y))
+	#define object_set_size(obj,S)     (objects[obj].size=(S))
+	#define object_set_state(obj,S)    (objects[obj].state=(S))
+#endif
 extern void object_move(obj_hdl_t object);
 
 extern void object_accel(obj_hdl_t object, char ddx, char ddy);

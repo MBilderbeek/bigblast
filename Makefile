@@ -1,11 +1,19 @@
+.SUFFIXES:
+.SUFFIXES: .o .c .as
+
+.as.o:
+	$(CC) -c $(CFLAGS) $<
+.c.o:
+	$(CC) -c $(CFLAGS) $<
+
 CC=htc
-CFLAGS=-O # -DDEBUG_FPS # -DDEBUG_RENDERER
+CFLAGS=-O # -DUSE_FUNCTIONS # -DDEBUG_FPS # -DDEBUG_RENDERER
 TARGET=bigblast
 LIBS=-lg -lf
-EXTRAS=gs2.o
-OTHERFILES=ships.sr5
+EXTRAS=
+OTHERFILES=./disk/ships.sr5 ./disk/ships.pl5
 DOSFILEPATH=./disk/
-EMULATOR=openmsx
+EMULATOR=openmsx 
 EMUDISK=-diska
 
 OBJECTS=bigblast.o \
@@ -19,7 +27,8 @@ OBJECTS=bigblast.o \
 	controls.o \
 	collisio.o \
 	font.o \
-	menu.o
+	menu.o \
+	gs2.o
 
 all: emutest
 
@@ -38,6 +47,6 @@ $(TARGET): $(OBJECTS)
 clean:
 	rm -f $(TARGET).com $(OBJECTS) $(TARGET).dsk autoexec.bat
 
-$(TARGET).o: $(TARGET).c
-object.o:	object.c object.h
+#$(TARGET).o: $(TARGET).c
+#object.o:	object.c object.h
 

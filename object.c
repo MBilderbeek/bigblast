@@ -1,4 +1,4 @@
-/* $Id: object.c,v 1.5 2003/05/29 22:13:03 manuel Exp $
+/* $Id: object.c,v 1.6 2004/01/25 21:49:20 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -19,7 +19,12 @@
 
 #define NOFOBJECTS 128
 
+#ifdef USE_FUNCTIONS
 static object_t objects[NOFOBJECTS];
+#else
+object_t objects[NOFOBJECTS];
+#endif
+
 static obj_hdl_t object_last;
 
 extern char mysqrt(int n);
@@ -84,6 +89,7 @@ void object_destroy(obj_hdl_t *object)
 		*object = OBJ_VOID;
 }
 
+#ifdef USE_FUNCTIONS
 int object_get_x(obj_hdl_t object)
 {
 	return (objects[object].x);
@@ -137,6 +143,7 @@ void object_set_state(obj_hdl_t object, state_e state)
 {
 	objects[object].state = state;
 }
+#endif
 
 void object_move(obj_hdl_t object)
 {

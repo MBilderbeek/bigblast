@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.26 2003/05/29 21:56:46 manuel Exp $
+/* $Id: renderer.c,v 1.27 2004/01/25 21:49:20 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -71,27 +71,7 @@
 #define	C_SHIELD_O_METER 14
 #define	C_WHITE 15
 
-static int palette[] = 
-{	/*-GRB*/
-	0x0000,
-	0x0000, /* 1: black                    */
-	0x0330, /* 2:                          */
-	0x0330, /* 3:                          */
-	0x0337, /* 4:                          */
-	0x0330, /* 5:                          */
-	0x0330, /* 6:                          */
-	0x0330, /* 7:                          */
-	0x0771, /* 8: yellow    ufo            */
-	0x0107, /* 9: d blue    shield         */
-	0x0327, /*10: l blue    shield         */
-	0x0664, /*11: l yellow  explosion/ufo  */
-	0x0222, /*12: d grey    all            */
-	0x0333, /*13: m grey    all            */
-	0x0555, /*14: l grey    all            */
-	0x0777  /*15: white     all            */
-};
-
-int gs2loadgrp(uchar scrnmode, uchar page, char *filename);
+static int palette[128];
 
 static void render_ship(onoff_t boost, onoff_t shield);
 static void render_ufo();
@@ -104,6 +84,8 @@ int *Timer=(int *)0xFC9E;                                /*Systeemtimer*/
 
 unsigned int frame_counter;
 
+extern int gs2loadgrp(char *,  uchar);
+extern int gs2loadpal(char *, int *);
 /*
  * EXTERNAL FUNCTIONS
  */
@@ -111,8 +93,7 @@ unsigned int frame_counter;
 void render_init()
 {
 	uchar i;
-	char filename[16];
-	
+
 	ginit();
 	color(15,0,0);
 	screen(5);
@@ -122,8 +103,17 @@ void render_init()
 		pset(i*6, 0, 15, TPRESET);
 		grpprt("Loading GFX - Plz wait..."[i],PSET);
 	}
-	strcpy(filename,"SHIPS.SR5"); 
-	gs2loadgrp(5, GFXPAGE, filename);
+	
+	
+	(void) gs2loadgrp("ships.sr5", GFXPAGE);
+	(void) gs2loadpal("ships.pl5", palette);
+	
+	/* DOUBLE BUFFERING
+	 * setpg(1,1);
+	 * boxfill(0,0, 255,211, 0, PSET); // wipe screen
+	 * setpg(0,0);
+	 */
+	
 	boxfill(0,0, 255,211, 0, PSET); // wipe screen
 	*Timer=0;
 }
@@ -146,7 +136,12 @@ void playscreen_init()
 	boxline (SHIELD_O_METER_X,SHIELD_O_METER_Y, 
 		 SHIELD_O_METER_X+63+1,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
 		 C_WHITE, PSET);
-	
+
+	/* DOUBLE BUFFERING
+	 * cpyv2v(0,0,255,211,GAMEPAGE,0,0,1-GAMEPAGE,PSET);
+	 *
+	 * setpg(GAMEPAGE,1-GAMEPAGE);
+	 */
 }
 	
 
@@ -183,6 +178,10 @@ void render_frame(onoff_t boost, onoff_t shield, char noflives)
 #endif
 	while (*Timer<6);
 	*Timer=0;
+	/* DOUBLE BUFFERING
+	 * setpg(c_apage,c_dpage);
+	 */
+
 	frame_counter++;
 	if (the_ship.ship_obj!=OBJ_VOID) render_ship(boost, shield);
 	render_ufo();
