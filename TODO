@@ -1,11 +1,10 @@
-- snelheid UFO bullet mag wel wat uniformer
+- snelheid UFO bullet mag wel wat uniformer of anderszins verbeterd
 - bug oplossen als tinkeroid je raakt terwijl je stilstaat: uit elkaar vliegen
 - optimalisatie: hou aantal astroids/kogels/explosies bij zodat als je ze
   allemaal gehad hebt je niet meer hoeft te zoeken -> implementeren voor
   kogels?
 - echtere levels
 - andere vijanden, behalve tinkbare asteroids en ufo's dan, want die hebben we
-  al
-- schietende ufo's, want nu zijn ze wat saai
+  al <- dit is wel een beetje lam commentaar <- nou wordt het nog lammer!
 - graphics
 - geluid
