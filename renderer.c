@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.14 2003/01/12 23:03:29 manuel Exp $
+/* $Id: renderer.c,v 1.15 2003/01/16 23:28:31 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -225,6 +225,7 @@ static void render_asteroids()
 	int dx_prev, dy_prev;
 	int x_cur, y_cur;
 	int x_prev, y_prev;
+	int tilesize;
 	char animstep = frame_counter%4;
 	state_e state;
 	
@@ -245,21 +246,35 @@ static void render_asteroids()
 			{
 				dx_prev = OBJ2GFX( x_prev );
 				dy_prev = OBJ2GFX( y_prev );
+				tilesize = AST_TILE_SIZE;
+				switch (the_asteroids[i].size)
+				{
+					case AST_BIG:
+						sx=AST_SX_BIG;
+						break;
+				 	case AST_MEDIUM:
+						sx=AST_SX_MEDIUM;
+						dx_prev += 3;
+						dy_prev += 3;
+						tilesize -= 5;
+						break;
+					case AST_SMALL:
+						sx=AST_SX_SMALL;
+						dx_prev += 5;
+						dy_prev += 5;
+						tilesize -= 9;
+						break;
+					default:
+						break;
+					}
 				cpyv2v(dx_prev, dy_prev, 
-				       dx_prev+AST_TILE_SIZE-1, 
-				       dy_prev+AST_TILE_SIZE-1, 
+				       dx_prev+tilesize-1, 
+				       dy_prev+tilesize-1, 
 				       BGPAGE, dx_prev, dy_prev, GAMEPAGE,
 				       PSET);
 				state = object_get_state(the_asteroids[i].asteroid_obj);
 				if(state != DYING)
 				{
-					switch (the_asteroids[i].size)
-					{
-						case AST_BIG:    sx=AST_SX_BIG;    break;
-					 	case AST_MEDIUM: sx=AST_SX_MEDIUM; break;
-						case AST_SMALL:  sx=AST_SX_SMALL;  break;
-						default: break;
-					}
 					dx = OBJ2GFX( x_cur );
 					dy = OBJ2GFX( y_cur );
 					cpyv2v(sx+(animstep*AST_TILE_SIZE), 
