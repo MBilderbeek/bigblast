@@ -1,4 +1,4 @@
-/* $Id: ship.h,v 1.3 2002/11/01 17:57:18 eric Exp $
+/* $Id: ship.h,v 1.4 2002/12/26 17:04:00 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -62,6 +62,8 @@ extern heading_table_t heading2dxdy;
 /*
  * EXTERNAL FUNCTIONS
  */
+
+extern void ship_reset();
 
 extern void ship_init();
 

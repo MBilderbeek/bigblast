@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.8 2002/11/19 23:18:15 manuel Exp $
+/* $Id: bigblast.c,v 1.9 2002/12/26 17:04:00 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -27,6 +27,8 @@
 int *JIFFY = (int *)0xFC9E;
 unsigned int score;
 unsigned char level;
+static char quit=0;
+static char noflives=9;
 
 static int get_rnd_coord(int range)
 {
@@ -71,37 +73,18 @@ static void add_bonus(unsigned char level, unsigned char noflives)
 	write_cent(string, MSG_BONUS_BASE + 40);
 }
 
-void main ()
+void play_level(char level)
 {
-	char quit=0;
-	ast_hdl_t a=0;
-	int i=0;
-	char noflives=9;
 	int fire = 0;
+	int i;
+	ast_hdl_t a=0;
 	char string[100];
-
+	
 	onoff_t boost=OFF;
 	onoff_t shield=OFF;
 	rotdir_t rotdir=ROT_NONE;
-
-	char *CLICKSW=(char *)0xF3DB;
-	char clicksw_old=*CLICKSW;
-	*CLICKSW=0;        
-
-	srand(*JIFFY);
-
-	render_init();
-
-	objects_init();
-	ship_init();
-	bullets_init();
-	asteroids_init();
 	
-	score = 0;
-		
-	level = 1;
-	// start level
-	for (i=0; i<3; i++)
+	for (i=0; i<2+level; i++) // Actually: load level data or so
 	{
 		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
 				       get_rnd_coord(OBJ_MAX_Y), AST_BIG);
@@ -111,13 +94,17 @@ void main ()
 			  
 	}
 	
-	frame_counter = 0;
+	frame_counter = 0;    
+	
+	cls();
 	sprintf(string, "Wave: %02d", level);
 	write_cent(string, 102);
 	*JIFFY=0;
 	while (*JIFFY<50);
 
 	playscreen_init();
+
+	ship_reset();
 	
 	while (!quit && noflives!=0 && nof_asteroids>0)
 	{
@@ -145,16 +132,46 @@ void main ()
 		check_quit(&quit);
 	}
 	render_frame(boost, shield, noflives); // update noflives on screen
-
-	// end level
-	// 
-	
 	if (nof_asteroids==0)
 	{
 		add_bonus(level, noflives);
-		sprintf(string,"You won! Good man!\n");
+		sprintf(string,"Wave %d completed!",level);
+		write_cent(string, MSG_BASE);
+
+		kilbuf();
+		while (!kbhit());
+		kilbuf();
 	}
-	else if (noflives==0)
+
+}
+
+void main ()
+{
+	char string[100];
+
+	char *CLICKSW=(char *)0xF3DB;
+	char clicksw_old=*CLICKSW;
+	*CLICKSW=0;        
+
+	srand(*JIFFY);
+
+	render_init();
+
+	objects_init();
+	ship_init();
+	bullets_init();
+	asteroids_init();
+	
+	score = 0;
+		
+	level = 0;
+	
+	while (!quit && noflives>0)
+	{
+		play_level(++level);
+	}
+
+	if (noflives==0)
 	{
 		sprintf(string,"Game over! You lost! (Sucker!)");
 	}
