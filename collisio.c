@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.9 2003/02/14 00:17:15 manuel Exp $
+/* $Id: collisio.c,v 1.10 2003/02/15 12:03:56 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -70,14 +70,16 @@ char ship_hit(void)
 	astsize_e ast_size;
 	int ast_x, ast_y;
 	int delta_x, delta_y, delta_dia;
+	char counter=0;
 
 	ship_x += GFX2OBJ(SHIP_TILE_SIZE) >> 1;
 	ship_y += GFX2OBJ(SHIP_TILE_SIZE) >> 1;
 
-	for (i=0; i<MAX_NOF_ASTEROIDS && !hit; i++)
+	for (i=0; i<MAX_NOF_ASTEROIDS && !hit && counter<=nof_asteroids; i++)
 	{
 		if (the_asteroids[i].size != AST_NONE)
 		{
+			counter++;
 			ast_obj = the_asteroids[i].asteroid_obj;
 			delta_dia = (get_ast_dia(i) + GFX2OBJ(SHIP_DIA)) >> 1;
 			ast_x = object_get_x(ast_obj) + ( GFX2OBJ(AST_TILE_SIZE) >> 1 );
@@ -124,13 +126,15 @@ void bullets_n_asteroids()
 	int bx, by;
 	int dx, dy;
 	int dia;
+	char counter=0;
 
 	state_e ast_state;
 	
-	for (i=0; i<MAX_NOF_ASTEROIDS; i++)		
+	for (i=0; i<MAX_NOF_ASTEROIDS && counter<=nof_asteroids; i++)		
 	{
 		if(the_asteroids[i].size != AST_NONE)
 		{
+			counter++;
 			ast_state = 
 			    object_get_state(the_asteroids[i].asteroid_obj);
 

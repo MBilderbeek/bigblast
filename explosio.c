@@ -1,4 +1,4 @@
-/* $Id: explosio.c,v 1.2 2003/02/14 17:52:28 eric Exp $
+/* $Id: explosio.c,v 1.3 2003/02/15 12:03:56 manuel Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -41,11 +41,13 @@ void explosions_init()
 void explosions_move()
 {
 	exp_hdl_t i;
+	char counter=0;
 
-	for (i=0; i<MAX_NOF_EXPLOSIONS; i++)
+	for (i=0; i<MAX_NOF_EXPLOSIONS && counter<=nof_explosions; i++)
 	{
 		if (the_explosions[i].age > 0)
 		{
+			counter++;
 			object_move(the_explosions[i].explosion_obj);
 			the_explosions[i].age--;
 			if (the_explosions[i].age == 0)
@@ -53,7 +55,10 @@ void explosions_move()
 						 DYING);
 		}
 		else if (object_get_state(the_explosions[i].explosion_obj) == DYING)
+		{
 			explosion_destroy(i);
+			counter++;
+		}
 	}
 }
 

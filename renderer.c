@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.17 2003/02/14 00:17:15 manuel Exp $
+/* $Id: renderer.c,v 1.18 2003/02/15 12:03:56 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -191,7 +191,7 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	static onoff_t shield_prev;
 
 	if (the_ship.shield_energy > 0 && shield == ON)
-		the_ship.shield_energy--;
+		the_ship.shield_energy--; // shouldn't be in the renderer!
 	
 	if ( (x_cur != x_prev) || (y_cur != y_prev) ||
 	     (the_ship.heading != the_ship.heading_prev) ||
@@ -242,12 +242,14 @@ static void render_asteroids()
 	int tilesize;
 	char animstep = frame_counter%4;
 	state_e state;
+	char counter=0;
 	
-	for (i=0; i<MAX_NOF_ASTEROIDS; i++)
+	for (i=0; i<MAX_NOF_ASTEROIDS && counter<=nof_asteroids; i++)
 	{
 		
 		if (the_asteroids[i].size != AST_NONE)
 		{
+			counter++;
 			x_cur = object_get_x(the_asteroids[i].asteroid_obj);
 			y_cur = object_get_y(the_asteroids[i].asteroid_obj);
 			x_prev = object_get_x_prev(
@@ -360,11 +362,13 @@ static void render_explosions()
 	int tilesize;
 	state_e state;
 	int offset;
+	char counter=0;
 	
-	for (i=0; i<MAX_NOF_EXPLOSIONS; i++)
+	for (i=0; i<MAX_NOF_EXPLOSIONS && counter<=nof_explosions; i++)
 	{
 		if (the_explosions[i].explosion_obj != OBJ_VOID)
 		{
+			counter++;
 			x_cur = object_get_x(the_explosions[i].explosion_obj);
 			y_cur = object_get_y(the_explosions[i].explosion_obj);
 			x_prev = object_get_x_prev(

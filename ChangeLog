@@ -1,6 +1,13 @@
-$Id: ChangeLog,v 1.15 2003/02/14 17:52:28 eric Exp $
+$Id: ChangeLog,v 1.16 2003/02/15 12:03:56 manuel Exp $
 
-2003/02/14 Eric & Manuel
+2003/02/16 Manuel
+	* Implemented optimalization by counting number of asteroids and
+	  explosions already found when processing their arrays (not for
+	  bullets yet)
+	* If you hit an asteroid with shield on, the shield energy gets a
+	  penalty now
+
+2003/02/15 Eric & Manuel
 	* Level finished fine tuned
 	* Proper checking for pressed keys
 	* Explosions work 100% now

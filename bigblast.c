@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.13 2003/02/14 17:52:28 eric Exp $
+/* $Id: bigblast.c,v 1.14 2003/02/15 12:03:56 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -30,6 +30,9 @@
 #define MSG_BONUS_BASE 80
 #define MENU_BASE_X 100
 #define MENU_BASE_Y 150 
+
+// This is the shield energy penalty for hitting an asteroid with shield on
+#define AST_SH_PENALTY 25 		
 
 int *JIFFY = (int *)0xFC9E;
 unsigned int score;
@@ -138,9 +141,17 @@ void play_level(char level)
 				ship_destroy();
 				boost=OFF;
 			}
-			else if (ship_hit() && (!shield))
+			else if (ship_hit())
 			{
-				object_set_state(the_ship.ship_obj,DYING);
+				if (shield)
+				{
+					if (the_ship.shield_energy > AST_SH_PENALTY)
+						the_ship.shield_energy-=AST_SH_PENALTY;
+					else
+						the_ship.shield_energy=0;
+				}
+				else
+					object_set_state(the_ship.ship_obj,DYING);
 			}	
 		}
 		else
