@@ -1,4 +1,4 @@
-/* $Id: asteroid.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: asteroid.c,v 1.3 2002/10/12 22:18:56 eric Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -72,19 +72,23 @@ void asteroid_destroy(ast_hdl_t ast)
 	ast_hdl_t the_new_ast;
 	int x = object_get_x(the_asteroids[ast].asteroid_obj);
 	int y = object_get_y(the_asteroids[ast].asteroid_obj);
+	int dx = object_get_dx(the_asteroids[ast].asteroid_obj);
+	int dy = object_get_dy(the_asteroids[ast].asteroid_obj);
 	astsize_e size = the_asteroids[ast].size;
 	
 	if (size > AST_SMALL)
 	{
 		/* create 2 new ones */
-		the_new_ast = asteroid_create (x, y, size - 1);
+		the_new_ast = asteroid_create (x-(dy<<1), y+(dx<<1), size - 1);
 		object_accel(the_asteroids[the_new_ast].asteroid_obj,
-			     rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
-		             rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
-		the_new_ast = asteroid_create (x, y, size - 1);
+			     -dy, dx);
+			     //rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
+		             //rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
+		the_new_ast = asteroid_create (x+(dy<<1), y-(dx<<1), size - 1);
 		object_accel(the_asteroids[the_new_ast].asteroid_obj,
-			     rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
-		             rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
+			     dy,-dx);
+			     //rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
+		             //rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
 	}
 	
 	object_destroy(&(the_asteroids[ast].asteroid_obj));

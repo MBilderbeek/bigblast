@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.3 2002/10/05 20:31:45 eric Exp $
+/* $Id: collisio.c,v 1.4 2002/10/12 22:18:56 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -20,8 +20,6 @@
 /*
  * LOCAL DEFINITIONS
  */
-
-#define ABS(x) ((x)<0 ? -(x) : (x))
 
 #define AST_BIG_DIA (AST_TILE_SIZE - 2)
 #define AST_MEDIUM_DIA (AST_TILE_SIZE - 4)
@@ -61,9 +59,10 @@ char ship_hit(onoff_t shield)
 	int ship_x = object_get_x(the_ship.ship_obj); 
 	int ship_y = object_get_y(the_ship.ship_obj); 
 	int ast_x, ast_y;
+	int ast_ddx, ast_ddy;
 	int delta_x, delta_y, delta_dia;
 
-	ship_x += GFX2OBJ(SHIP_TILE_SIZE) >> 1; //kutcompiler
+	ship_x += GFX2OBJ(SHIP_TILE_SIZE) >> 1;
 	ship_y += GFX2OBJ(SHIP_TILE_SIZE) >> 1;
 
 	for (i=0; i<MAX_NOF_ASTEROIDS && !hit; i++)
@@ -74,16 +73,24 @@ char ship_hit(onoff_t shield)
 			ast_x = object_get_x(the_asteroids[i].asteroid_obj) + 
 				( GFX2OBJ(AST_TILE_SIZE) >> 1 );
 			delta_x = ast_x - ship_x;
-			delta_x = ABS(delta_x); // we can optimize this!
+			if(delta_x < 0) delta_x = -delta_x;
 			if (delta_x <= delta_dia)
 			{
 				ast_y = object_get_y(the_asteroids[i].asteroid_obj) + 
 					( GFX2OBJ(AST_TILE_SIZE) >> 1 );
 				delta_y = ast_y - ship_y;
-				delta_y = ABS(delta_y); // see above
+				if(delta_y < 0) delta_y = -delta_y;
 			
 				if (delta_y <= delta_dia)
 				{
+					/* fake asteroid moving directly at ship,
+					 * so 'debris' will be moving away from ship
+					 * Some vector magic ;-)
+					 */
+					ast_ddx = - object_get_dx(the_asteroids[i].asteroid_obj) - delta_x;
+					ast_ddy = - object_get_dy(the_asteroids[i].asteroid_obj) - delta_y;
+					object_accel(the_asteroids[i].asteroid_obj, ast_ddx, ast_ddy);
+
 					object_set_state(the_asteroids[i].asteroid_obj, DYING);
 					if (!shield) hit = 1;
 				}
@@ -92,7 +99,7 @@ char ship_hit(onoff_t shield)
 
 	}
 	if (hit && !shield){
-		object_set_state(the_ship.ship_obj,DYING); // side effect
+		object_set_state(the_ship.ship_obj,DYING);
 	}
 	return (hit);
 }
@@ -130,19 +137,18 @@ void bullets_n_asteroids()
 				   + ( GFX2OBJ(AST_TILE_SIZE) >> 1 );
 				dia = get_ast_dia(i) >> 1;
 	
-				/* for all bullets */
 				for (b=0; b<MAX_NOF_BULLETS; b++)
 				{
 					if(the_bullets[b].age > 1)
 					{
 						bx = object_get_x(the_bullets[b].bullet_obj);
 						dx = ax - bx;
-						dx = ABS(dx);
+						if(dx < 0) dx = -dx;
 						if (dx <= dia)
 						{
 							by = object_get_y(the_bullets[b].bullet_obj);
 							dy = ay - by;
-							dy = ABS(dy);
+							if(dy < 0) dy = -dy;
 							if (dy <= dia)
 							{
 								object_set_state(the_asteroids[i].asteroid_obj, DYING);

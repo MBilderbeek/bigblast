@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.5 2002/10/12 20:28:46 eric Exp $
+/* $Id: renderer.c,v 1.6 2002/10/12 22:18:56 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -77,10 +77,19 @@ void render_init()
 	{
 		setplt(i, palette[i]);
 	}
+	
+	for(i=0; i < 25; i++)
+	{
+		pset(i*6, 0, 15, TPRESET);
+		grpprt("Loading GFX - Plz wait..."[i],PSET);
+	}
 	strcpy(filename,"\"SHIPS.COP\""); 
 	loadgrp(filename, 0, 0, GFXPAGE);
 	strcpy(filename, "\"BACKG.COP\"");
 	loadgrp(filename, 0, 0, BGPAGE);
+	setpg(0,BGPAGE);
+	boxline(0,0, 255,211, 1, PSET);
+	setpg(0,0);
 
 	cpyv2v(0,0, 255,211, BGPAGE, 0,0, 0, PSET);
 }
@@ -131,7 +140,7 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	if ( (x_cur != x_prev) || (y_cur != y_prev) ||
 	     (the_ship.heading != the_ship.heading_prev) ||
 	     (object_get_state(the_ship.ship_obj) == NEW)||
-	     shield != shield_prev)
+	     shield || shield_prev )
 	{
 		if ( object_get_state(the_ship.ship_obj) == NEW )
 			object_set_state(the_ship.ship_obj, ALIVE);
@@ -241,7 +250,7 @@ static void render_bullets()
 					!= DYING)
 				boxfill(dx, dy, dx+BULLET_TILE_SIZE-1, 
 					dy+BULLET_TILE_SIZE-1, 
-					4, PSET); // temporary
+					15, PSET); // temporary
 
 /*			cpyv2v(sx+(BULLET_TILE_SIZE), BULLET_SY, 
 			       sx+BULLET_TILE_SIZE-1, 
