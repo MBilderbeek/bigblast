@@ -1,8 +1,6 @@
 - double buffering:
-  - alles eerst weghalen en dan pas teken ivm overlap
   - schermovergangen beetje fixen
   - include glib.h weghalen bij object.h
-  - werkt nu alleen nog met USE_FUNCTIONS
 - snelheid UFO bullet mag wel wat uniformer of anderszins verbeterd
 - optimalisatie: hou aantal astroids/kogels/explosies bij zodat als je ze
   allemaal gehad hebt je niet meer hoeft te zoeken -> implementeren voor

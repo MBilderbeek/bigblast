@@ -1,4 +1,11 @@
-$Id: ChangeLog,v 1.28 2003/05/29 22:48:10 manuel Exp $
+$Id: ChangeLog,v 1.29 2004/01/28 21:44:50 manuel Exp $
+
+2004/01/28 Manuel
+	* Split rendering and unrendering of objects
+	* Major clean ups in renderer
+
+2004/01/27 Manuel
+	* Added initial double buffering (see TODO)
 
 2003/05/30 Manuel & Eric
 	* Added a homing tinkeroid! Watch it, buddy! Search and destroy...
