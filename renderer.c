@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.4 2002/10/05 20:31:45 eric Exp $
+/* $Id: renderer.c,v 1.5 2002/10/12 20:28:46 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -21,9 +21,9 @@ static int palette[] =
 {	/*-GRB*/
 	0x0000,
 	0x0111, /* 1: black    */
-	0x0077, /* 2: shield 1 */
-	0x0044, /* 3: shield 2 */
-	0x0022, /* 4: shield 3 */
+	0x0707, /* 2: shield 1 */
+	0x0404, /* 3: shield 2 */
+	0x0202, /* 4: shield 3 */
 	0x0333, /* 5:          */
 	0x0527, /* 6:          */
 	0x0527, /* 7:          */
@@ -51,6 +51,7 @@ extern void loadgrp(char *filename, unsigned int x, unsigned char y, char page);
 #define AST_SY (4*SHIP_TILE_SIZE)
 #define SHIELD_SY (AST_SY + 16)
 #define GFXPAGE 2
+#define BGPAGE  3
 
 static void render_ship(onoff_t boost, onoff_t shield);
 static void render_asteroids();
@@ -78,6 +79,10 @@ void render_init()
 	}
 	strcpy(filename,"\"SHIPS.COP\""); 
 	loadgrp(filename, 0, 0, GFXPAGE);
+	strcpy(filename, "\"BACKG.COP\"");
+	loadgrp(filename, 0, 0, BGPAGE);
+
+	cpyv2v(0,0, 255,211, BGPAGE, 0,0, 0, PSET);
 }
 
 void render_frame(onoff_t boost, onoff_t shield)
@@ -131,8 +136,9 @@ static void render_ship(onoff_t boost, onoff_t shield)
 		if ( object_get_state(the_ship.ship_obj) == NEW )
 			object_set_state(the_ship.ship_obj, ALIVE);
 		else
-			boxfill(dx_prev, dy_prev, dx_prev+SHIP_TILE_SIZE-1, 
-				dy_prev+SHIP_TILE_SIZE-1, 0, PSET);
+			cpyv2v(dx_prev, dy_prev, dx_prev+SHIP_TILE_SIZE-1, 
+				dy_prev+SHIP_TILE_SIZE-1, BGPAGE,
+			       dx_prev, dy_prev, 0, PSET);
 		if (object_get_state(the_ship.ship_obj) != DYING)
 		{
 			cpyv2v(sx, sy, sx+SHIP_TILE_SIZE-1, sy+SHIP_TILE_SIZE-1,
@@ -188,10 +194,10 @@ static void render_asteroids()
 
 			if ( (x_cur != x_prev) || (y_cur != y_prev) )
 			{
-				boxfill(dx_prev, dy_prev, 
-						dx_prev+AST_TILE_SIZE-1, 
-						dy_prev+AST_TILE_SIZE-1, 
-						0, PSET);
+				cpyv2v(dx_prev, dy_prev, 
+				       dx_prev+AST_TILE_SIZE-1, 
+				       dy_prev+AST_TILE_SIZE-1, 
+				       BGPAGE, dx_prev, dy_prev, 0, PSET);
 				if(state != DYING)
 					cpyv2v(sx+(animstep*AST_TILE_SIZE), 
 						AST_SY, 
@@ -227,10 +233,10 @@ static void render_bullets()
 			dx_prev = OBJ2GFX( x_prev );
 			dy_prev = OBJ2GFX( y_prev );
 
-			boxfill(dx_prev, dy_prev, 
-					dx_prev+BULLET_TILE_SIZE-1, 
-					dy_prev+BULLET_TILE_SIZE-1, 
-					0, PSET);
+			cpyv2v(dx_prev, dy_prev, 
+			       dx_prev+BULLET_TILE_SIZE-1, 
+			       dy_prev+BULLET_TILE_SIZE-1, 
+			       BGPAGE, dx_prev, dy_prev, 0, PSET);
 			if (object_get_state(the_bullets[i].bullet_obj)
 					!= DYING)
 				boxfill(dx, dy, dx+BULLET_TILE_SIZE-1, 
