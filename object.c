@@ -1,4 +1,4 @@
-/* $Id: object.c,v 1.4 2003/05/29 21:56:46 manuel Exp $
+/* $Id: object.c,v 1.5 2003/05/29 22:13:03 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -22,7 +22,7 @@
 static object_t objects[NOFOBJECTS];
 static obj_hdl_t object_last;
 
-static char mysqrt(int n);
+extern char mysqrt(int n);
 
 /*
  * EXTERNAL FUNCTIONS
