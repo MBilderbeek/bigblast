@@ -1,4 +1,4 @@
-/* $Id: asteroid.c,v 1.3 2002/10/12 22:18:56 eric Exp $
+/* $Id: asteroid.c,v 1.4 2002/10/17 22:09:23 manuel Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -20,6 +20,7 @@
 
 asteroid_t the_asteroids[MAX_NOF_ASTEROIDS];
 
+unsigned int nof_asteroids;
 
 /*
  * EXTERNAL FUNCTIONS
@@ -58,6 +59,7 @@ ast_hdl_t asteroid_create(int x, int y, astsize_e size)
 			the_asteroids[i].asteroid_obj = 
 				object_create (x, y, 0, 0, OBJ_AST);
 			the_asteroids[i].size = size;
+			nof_asteroids++;
 			break;
 		}
 	}
@@ -93,5 +95,6 @@ void asteroid_destroy(ast_hdl_t ast)
 	
 	object_destroy(&(the_asteroids[ast].asteroid_obj));
 	the_asteroids[ast].size = AST_NONE;
+	nof_asteroids--;
 }
 

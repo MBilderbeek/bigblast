@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.4 2002/10/05 20:31:45 eric Exp $
+/* $Id: bigblast.c,v 1.5 2002/10/17 22:09:23 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -33,7 +33,6 @@ void main ()
 	char quit=0;
 	ast_hdl_t a=0;
 	int i=0;
-	obj_hdl_t dummy;
 	char noflives=10;
 	int fire = 0;
 
@@ -53,7 +52,7 @@ void main ()
 	ship_init();
 	bullets_init();
 	asteroids_init();
-	
+
 	for (i=0; i<3; i++)
 	{
 		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
@@ -64,7 +63,7 @@ void main ()
 			  
 	}
 	
-	while (!quit && noflives!=0)
+	while (!quit && noflives!=0 && nof_asteroids>0)
 	{
 		render_frame(boost, shield);
 		check_controls(&rotdir, &boost, &shield, &fire);

@@ -1,4 +1,4 @@
-/* $Id: asteroid.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+/* $Id: asteroid.h,v 1.3 2002/10/17 22:09:23 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -42,6 +42,8 @@ typedef struct
 } asteroid_t;
 	
 extern asteroid_t the_asteroids[MAX_NOF_ASTEROIDS];
+
+extern unsigned int nof_asteroids;
 
 /*
  * EXTERNAL FUNCTIONS
