@@ -1,4 +1,4 @@
-/* $Id: asteroid.c,v 1.12 2003/02/28 00:24:34 manuel Exp $
+/* $Id: asteroid.c,v 1.13 2003/05/09 17:15:04 manuel Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -127,7 +127,7 @@ void asteroid_destroy(ast_hdl_t ast)
 	explosion_create(x, y, (expsize_e) size, dx, dy);
 }
 
-void kill_all_asteroids(void)
+void kill_all_asteroids()
 {
 	ast_hdl_t i;
 

@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.22 2003/04/03 23:07:23 manuel Exp $
+/* $Id: bigblast.c,v 1.23 2003/05/09 17:15:04 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -36,6 +36,7 @@
 #define AST_SH_PENALTY 25 		
 
 int *JIFFY = (int *)0xFC9E;
+int rndinit=0;
 unsigned int score;
 unsigned int hiscore=0;
 unsigned char level;
@@ -116,6 +117,7 @@ void play_level(char level)
 	bullets_init();
 	asteroids_init();
 	explosions_init();
+
 	
 	for (i=0; i<1+level; i++) // Actually: load level data or so
 	{
@@ -127,7 +129,7 @@ void play_level(char level)
 			  
 	}
 	ufo_create(0,0);
-	
+
 	while (!quit && not_finished)
 	{
 		render_frame(boost, shield, noflives);
@@ -253,7 +255,11 @@ void main ()
 		write_cent(string, 212-10);
 		init_menu();
 		while (keypressed());
-		srand(*JIFFY); // now it is initialized at a random time
+		if (!rndinit) 
+		{
+			srand(*JIFFY); // now it is initialized at a random time
+			rndinit=1;
+		}
 		switch (menu_select())
 		{
 			case PLAY: play_game();	quit=0; break;

@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.24 2003/04/03 23:07:23 manuel Exp $
+/* $Id: renderer.c,v 1.25 2003/05/09 17:15:04 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -91,7 +91,7 @@ static int palette[] =
 	0x0777  /*15: white     all            */
 };
 
-extern void loadgrp(char *filename, unsigned int x, unsigned char y, char page);
+int gs2loadgrp(uchar scrnmode, uchar page, char *filename);
 
 static void render_ship(onoff_t boost, onoff_t shield);
 static void render_ufo();
@@ -122,8 +122,8 @@ void render_init()
 		pset(i*6, 0, 15, TPRESET);
 		grpprt("Loading GFX - Plz wait..."[i],PSET);
 	}
-	strcpy(filename,"\"SHIPS.COP\""); 
-	loadgrp(filename, 0, 0, GFXPAGE);
+	strcpy(filename,"SHIPS.SR5"); 
+	gs2loadgrp(5, GFXPAGE, filename);
 	boxfill(0,0, 255,211, 0, PSET); // wipe screen
 	*Timer=0;
 }

@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.17 2003/04/03 23:07:23 manuel Exp $
+/* $Id: collisio.c,v 1.18 2003/05/09 17:15:04 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -84,19 +84,11 @@ char ship_hit(void) // hip shit?
 				delta_dx = object_get_dx(ast_obj) - object_get_dx(ship_obj);
 				delta_dy = object_get_dy(ast_obj) - object_get_dy(ship_obj);
 
-				// attempting to fix a tinkeroid bug FIXME
+				/* In case we don't move, make sure we do */
 				if (delta_dx==0 && delta_dy==0)
 				{
-					int dx=OBJ2GFX(get_center_x(ast_obj)-get_center_x(ship_obj));
-					int dy=OBJ2GFX(get_center_y(ast_obj)-get_center_y(ship_obj));
-					//int r=sqrt(dx*dx+dy*dy);
-					int rsq=dx*dx+dy*dy;
-				    //int maxdist=(object_get_size(ast_obj)+object_get_size(ship_obj)) >> 1; //=dia1+dia2
-					//char *str;
-					delta_dx=GFX2OBJ((int)((float)800/(float)(rsq)));
-					delta_dy=GFX2OBJ((int)((float)800/(float)(rsq)));
-					//sprintf(str,"%d %d %d %d %d\n",delta_dx,delta_dy,dx,dy,rsq);
-					//write(str,0,0);
+					delta_dx=OBJ2GFX(get_center_x(ship_obj)-get_center_x(ast_obj));
+					delta_dy=OBJ2GFX(get_center_y(ship_obj)-get_center_y(ast_obj));
 				}
 					
 				weight = AST_BIG - the_asteroids[i].size;
@@ -104,14 +96,6 @@ char ship_hit(void) // hip shit?
 				/* ship gets (part of) ast's momentum */
 				object_accel(ship_obj, delta_dx >> weight, delta_dy >> weight);
 
-				/* ast loses (part of) its momentum */
-				// But this looks unnatural since it is
-				// only debris!
-				//object_accel(ast_obj,
-				//	     -(delta_dx >> ast_size),
-				//	     -(delta_dy >> ast_size));
-
-					
 				if (!the_asteroids[i].steel)
 				    object_set_state(ast_obj, DYING); //destroy in bullets check
 				else

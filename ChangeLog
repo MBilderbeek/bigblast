@@ -1,5 +1,9 @@
-$Id: ChangeLog,v 1.25 2003/04/03 23:07:23 manuel Exp $
+$Id: ChangeLog,v 1.26 2003/05/09 17:15:04 manuel Exp $
 
+2003/05/10 Manuel & Eric
+	* Fixed tinkeroid bug
+	* Fixed 'random' bug (srand initialisation)
+	* Use gs2loadgrp, man, is that fast!
 
 2003/04/04 Manuel & Eric
 	* UFOs fire bullets at the player! (speed needs fixing)
