@@ -1,6 +1,5 @@
-/*
- * FILE        : renderer.c
- * LAST UPDATE : 23 Jun 2002
+/* $Id: renderer.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :

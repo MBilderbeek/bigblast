@@ -1,6 +1,5 @@
-/* 
- * FILE        : ship.h 
- * LAST UPDATE : 10 May 2002
+/* $Id: ship.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :

@@ -1,6 +1,5 @@
-/* 
- * FILE        : collision.h 
- * LAST UPDATE : 09 Jul 2002
+/* $Id: collisio.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :

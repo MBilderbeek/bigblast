@@ -1,2 +1,6 @@
-- weghalen dode asteroids zodra dat nodig is
-- botsingen met asteroids
+- shield (zeker aan 't begin)
+- beetje: beter asteroids kunnen raken met kogels (dia tuning)
+- een klaar (levels?).
+- andere vijanden
+- eventuele optimalisaties van het e.e.a., vooral de collisiondetection
+

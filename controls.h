@@ -1,6 +1,5 @@
-/*
- * FILE        : controls.h
- * LAST UPDATE : 2 Jun 2002
+/* $Id: controls.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :

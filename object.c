@@ -1,6 +1,5 @@
-/*
- * FILE        : object.c
- * LAST UPDATE : 10 May 2002
+/* $Id: object.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :

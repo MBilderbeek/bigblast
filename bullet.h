@@ -1,6 +1,5 @@
-/* 
- * FILE        : bullet.h 
- * LAST UPDATE : 09 Jun 2002
+/* $Id: bullet.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :
@@ -20,7 +19,7 @@
  * DEFINITIONS
  */
 
-#define MAX_NOF_BULLETS 8
+#define MAX_NOF_BULLETS 6
 
 /*
  * TYPE DEFINITIONS

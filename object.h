@@ -1,6 +1,5 @@
-/* 
- * FILE        : object.h 
- * LAST UPDATE : 23 Jun 2002
+/* $Id: object.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :
@@ -18,7 +17,7 @@
 #define OBJ_MAX_X (4*960)
 #define OBJ_MAX_Y (4*784)
 
-#define OBJ_MAX_DXY 64
+#define OBJ_MAX_DXY (63)
 
 #define OBJ_VOID -1
 

@@ -1,6 +1,5 @@
-/* 
- * FILE        : renderer.h 
- * LAST UPDATE : 02 Jun 2002
+/* $Id: renderer.h,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :

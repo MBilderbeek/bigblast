@@ -1,6 +1,5 @@
-/*
- * FILE        : bigblast.c
- * LAST UPDATE : 2 Jun 2002
+/* $Id: bigblast.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :
@@ -60,8 +59,8 @@ void main ()
 		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
 				       get_rnd_coord(OBJ_MAX_Y), AST_BIG);
 		object_accel(the_asteroids[a].asteroid_obj,
-			     rand() % (OBJ_MAX_DXY)-(OBJ_MAX_DXY>>1), 
-			     rand() % (OBJ_MAX_DXY)-(OBJ_MAX_DXY>>1));
+			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
+			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
 			  
 	}
 	

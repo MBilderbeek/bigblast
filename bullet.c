@@ -1,6 +1,5 @@
-/*
- * FILE        : bullet.c
- * LAST UPDATE : 21 Jul 2002
+/* $Id: bullet.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :
@@ -20,7 +19,7 @@
  * LOCAL DEFINITIONS
  */
 
-#define NEW_BULLET_AGE 16
+#define NEW_BULLET_AGE 12
 #define BULLET_SPEED(x) ((x) * 7)
 
 bullet_t the_bullets[MAX_NOF_BULLETS];

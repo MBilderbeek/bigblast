@@ -1,6 +1,5 @@
-/*
- * FILE        : asteroid.c
- * LAST UPDATE : 9 Jun 2002
+/* $Id: asteroid.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :
@@ -80,12 +79,12 @@ void asteroid_destroy(ast_hdl_t ast)
 		/* create 2 new ones */
 		the_new_ast = asteroid_create (x, y, size - 1);
 		object_accel(the_asteroids[the_new_ast].asteroid_obj,
-			     rand()%(OBJ_MAX_DXY)-(OBJ_MAX_DXY>>1), 
-		             rand()%(OBJ_MAX_DXY)-(OBJ_MAX_DXY>>1));
+			     rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
+		             rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
 		the_new_ast = asteroid_create (x, y, size - 1);
 		object_accel(the_asteroids[the_new_ast].asteroid_obj,
-			     rand()%(OBJ_MAX_DXY)-(OBJ_MAX_DXY>>1), 
-		             rand()%(OBJ_MAX_DXY)-(OBJ_MAX_DXY>>1));
+			     rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
+		             rand()%(OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
 	}
 	
 	object_destroy(&(the_asteroids[ast].asteroid_obj));

@@ -1,6 +1,5 @@
-/*
- * FILE        : controls.c
- * LAST UPDATE : 2 Jun 2002
+/* $Id: controls.c,v 1.2 2002/09/27 17:27:26 manuel Exp $
+ *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
  * DESCRIPTION :
@@ -29,8 +28,8 @@ void check_quit(char *quit)
 
 void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *fire)
 {
-	static int old_strig = 0;
-	int new_strig = 0;
+	static int old_strig;
+	int new_strig;
 	
 	*boost=OFF;
 	*shield=OFF;
@@ -52,7 +51,7 @@ void check_controls(rotdir_t *rotdir, onoff_t *boost, onoff_t *shield, onoff_t *
 		old_strig = new_strig;
 		if(new_strig)
 			*fire = ON;
-		else 
-			*fire = OFF;
 	}
+	else 
+		*fire = OFF;
 }
