@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.5 2002/11/09 00:22:58 manuel Exp $
+/* $Id: collisio.c,v 1.6 2002/11/28 23:21:14 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -88,8 +88,8 @@ char ship_hit(onoff_t shield)
 					 * so 'debris' will be moving away from ship
 					 * Some vector magic ;-)
 					 */
-					ast_ddx = - object_get_dx(the_asteroids[i].asteroid_obj) - delta_x;
-					ast_ddy = - object_get_dy(the_asteroids[i].asteroid_obj) - delta_y;
+					ast_ddx = - object_get_dx(the_asteroids[i].asteroid_obj) + delta_x;
+					ast_ddy = - object_get_dy(the_asteroids[i].asteroid_obj) + delta_y;
 					object_accel(the_asteroids[i].asteroid_obj, ast_ddx, ast_ddy);
 
 					object_set_state(the_asteroids[i].asteroid_obj, DYING);

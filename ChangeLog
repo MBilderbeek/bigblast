@@ -1,4 +1,8 @@
-$Id: ChangeLog,v 1.6 2002/11/21 23:46:58 manuel Exp $
+$Id: ChangeLog,v 1.7 2002/11/28 23:21:14 manuel Exp $
+
+2002/11/29 Manuel & Eric
+	* Debris directions are now 45 degrees from original direction
+	  (still needs some fixing!)
 
 2002/11/22 Manuel & Eric
 	* Reduced playing ground ;-)
