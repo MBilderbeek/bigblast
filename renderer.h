@@ -1,4 +1,4 @@
-/* $Id: renderer.h,v 1.8 2003/02/16 15:34:01 eric Exp $
+/* $Id: renderer.h,v 1.9 2004/01/27 22:26:47 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -30,6 +30,8 @@
 extern unsigned int frame_counter;
 
 void render_init();
+void dedbuffer();
+void menuscreen_init();
 void playscreen_init();
 void render_frame(onoff_t boost, onoff_t shield, char noflives);
 void render_info(char noflives);

@@ -1,4 +1,4 @@
-/* $Id: renderer.c,v 1.27 2004/01/25 21:49:20 eric Exp $
+/* $Id: renderer.c,v 1.28 2004/01/27 22:26:47 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -108,14 +108,21 @@ void render_init()
 	(void) gs2loadgrp("ships.sr5", GFXPAGE);
 	(void) gs2loadpal("ships.pl5", palette);
 	
-	/* DOUBLE BUFFERING
-	 * setpg(1,1);
-	 * boxfill(0,0, 255,211, 0, PSET); // wipe screen
-	 * setpg(0,0);
-	 */
-	
-	boxfill(0,0, 255,211, 0, PSET); // wipe screen
 	*Timer=0;
+}
+
+void dedbuffer() // de-double-buffer
+{
+	setpg (c_apage,c_apage);
+}
+
+void menuscreen_init()
+{
+	setpg(0,0);
+	boxfill(0,0, 255,211, 0, PSET); // wipe screen
+	setpg(0,1);
+	boxfill(0,0, 255,211, 0, PSET); // wipe screen
+	setpg(0,0);
 }
 
 void playscreen_init()
@@ -125,10 +132,14 @@ void playscreen_init()
 	{
 		setplt(i, palette[i]);
 	}
-
-	generate_background();
 	
-	setpg(GAMEPAGE,GAMEPAGE);
+	boxfill(0,0, 255,211, 0, PSET); // wipe screen
+	setpg(c_apage,c_dpage);
+	boxfill(0,0, 255,211, 0, PSET); // wipe screen
+
+	setpg(1-GAMEPAGE,GAMEPAGE);
+	
+	generate_background();
 	
 	write("Score:", SCORE_X, SCORE_Y);
 	write("Ships:", LIVES_X, LIVES_Y);
@@ -137,18 +148,16 @@ void playscreen_init()
 		 SHIELD_O_METER_X+63+1,SHIELD_O_METER_Y+SHIELD_O_METER_H-1, 
 		 C_WHITE, PSET);
 
-	/* DOUBLE BUFFERING
-	 * cpyv2v(0,0,255,211,GAMEPAGE,0,0,1-GAMEPAGE,PSET);
-	 *
-	 * setpg(GAMEPAGE,1-GAMEPAGE);
-	 */
+	cpyv2v(0,0,255,211,GAMEPAGE,0,0,1-GAMEPAGE,PSET);
+	
+	setpg(GAMEPAGE,1-GAMEPAGE);
 }
 	
 
 static void generate_background()
 {
-	int i;
-	setpg(GAMEPAGE,BGPAGE);
+	int i, p=c_apage;
+	setpg(c_dpage,BGPAGE);
 	cls();
 	for (i=0; i<100; i++)
 	{
@@ -156,6 +165,7 @@ static void generate_background()
 	}
 	boxline(0,0, 255,211-8, 1, PSET);
 	cpyv2v(0,0, 255,211, BGPAGE, 0,0, GAMEPAGE, PSET);
+	setpg(c_dpage,p);
 }
 	
 
@@ -178,9 +188,8 @@ void render_frame(onoff_t boost, onoff_t shield, char noflives)
 #endif
 	while (*Timer<6);
 	*Timer=0;
-	/* DOUBLE BUFFERING
-	 * setpg(c_apage,c_dpage);
-	 */
+	setpg(c_apage,c_dpage);
+//	cpyv2v(0,0, 255,SCORE_Y-1, BGPAGE, 0,0, c_apage , PSET); // naieve double buffering: erase the whole page!
 
 	frame_counter++;
 	if (the_ship.ship_obj!=OBJ_VOID) render_ship(boost, shield);
@@ -206,41 +215,48 @@ static void render_ship(onoff_t boost, onoff_t shield)
 	int y_prev = object_get_y_prev(ship_obj);
 	static onoff_t shield_prev=0;
 
-	if ((x_cur != x_prev) || (y_cur != y_prev) ||
-	     (the_ship.heading != the_ship.heading_prev) ||
-	     (object_get_state(ship_obj) == NEW)||
-	     (object_get_state(ship_obj) == DYING)|| shield || shield_prev)
+	// always render the damn ship (removed optimization)
+	
+	tilesize = OBJ2GFX(object_get_size(ship_obj)) - 1;
+	if (object_get_state(ship_obj) == NEW)
+		object_set_state(ship_obj, ALIVE);
+	else
 	{
-		tilesize = OBJ2GFX(object_get_size(ship_obj)) - 1;
-		if (object_get_state(ship_obj) == NEW)
-			object_set_state(ship_obj, ALIVE);
-		else
-		{
-			dx_prev = OBJ2GFX(x_prev);
-			dy_prev = OBJ2GFX(y_prev);
-			cpyv2v(dx_prev, dy_prev,
-			       dx_prev+tilesize, dy_prev+tilesize, BGPAGE,
-			       dx_prev, dy_prev, GAMEPAGE, PSET);
-		}
-		if (object_get_state(ship_obj) != DYING)
-		{
-			dx = OBJ2GFX(x_cur);
-			dy = OBJ2GFX(y_cur);
-			sx = (the_ship.heading & 0x0F) << 4; 
-			sy = the_ship.heading & 0xF0; 
-			if (boost == ON) sy+=BOOST_OFFSET;
-			cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE, dx, dy, GAMEPAGE,
-							TPSET);
-			if(shield)
-			{
-				sx = SHIELD_SX + SHIELD_TILE_SIZE * anim_step;
-				cpyv2v(sx, SHIELD_SY, sx+SHIELD_TILE_SIZE-1,
-				         SHIELD_SY + SHIELD_TILE_SIZE - 1,
-				       GFXPAGE, dx, dy, GAMEPAGE, TPSET);
-			}
-		}
-		shield_prev = shield;
+		dx_prev = OBJ2GFX(x_prev);
+		dy_prev = OBJ2GFX(y_prev);
+		cpyv2v(dx_prev, dy_prev,
+		       dx_prev+tilesize, dy_prev+tilesize, BGPAGE,
+		       dx_prev, dy_prev, c_apage, PSET);
 	}
+	if (object_get_state(ship_obj) != DYING)
+	{
+		dx = OBJ2GFX(x_cur);
+		dy = OBJ2GFX(y_cur);
+		sx = (the_ship.heading & 0x0F) << 4; 
+		sy = the_ship.heading & 0xF0; 
+		if (boost == ON) sy+=BOOST_OFFSET;
+		cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE, dx, dy, c_apage,
+						TPSET);
+		if(shield)
+		{
+			sx = SHIELD_SX + SHIELD_TILE_SIZE * anim_step;
+			cpyv2v(sx, SHIELD_SY, sx+SHIELD_TILE_SIZE-1,
+			         SHIELD_SY + SHIELD_TILE_SIZE - 1,
+			       GFXPAGE, dx, dy, c_apage, TPSET);
+		}
+	}
+	else
+	{
+		x_prev = object_get_x_prev_op(ship_obj);
+		y_prev = object_get_y_prev_op(ship_obj);
+		
+		dx_prev = OBJ2GFX(x_prev);
+		dy_prev = OBJ2GFX(y_prev);
+		cpyv2v(dx_prev, dy_prev,
+		       dx_prev+tilesize, dy_prev+tilesize, BGPAGE,
+		       dx_prev, dy_prev, c_dpage, PSET);		
+	}
+	shield_prev = shield;
 }
 	
 static void render_asteroids()
@@ -274,7 +290,7 @@ static void render_asteroids()
 
 			tilesize--;
 			cpyv2v(dx_prev, dy_prev, dx_prev+tilesize, dy_prev+tilesize, 
-			       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
+			       BGPAGE, dx_prev, dy_prev, c_apage, PSET);
 				
 			state = object_get_state(the_asteroids[i].asteroid_obj);
 			if(state != DYING)
@@ -309,7 +325,18 @@ static void render_asteroids()
 				dx = OBJ2GFX(x_cur);
 				dy = OBJ2GFX(y_cur);
 				cpyv2v(sx, sy, sx+tilesize, sy+tilesize,
-				       GFXPAGE, dx, dy, GAMEPAGE, TPSET);
+				       GFXPAGE, dx, dy, c_apage, TPSET);
+			}
+			else
+			{
+				x_prev = object_get_x_prev_op(the_asteroids[i].asteroid_obj);
+				y_prev = object_get_y_prev_op(the_asteroids[i].asteroid_obj);
+
+				dx_prev = OBJ2GFX(x_prev);
+				dy_prev = OBJ2GFX(y_prev);
+
+				cpyv2v(dx_prev, dy_prev, dx_prev+tilesize, dy_prev+tilesize, 
+			       BGPAGE, dx_prev, dy_prev, c_dpage, PSET);
 			}
 		}
 	}
@@ -334,7 +361,7 @@ static void render_bullet_obj(obj_hdl_t bullet_obj)
 		size = OBJ2GFX(object_get_size(bullet_obj)) - 1;
 
 		cpyv2v(dx_prev, dy_prev, dx_prev+size, dy_prev+size, 
-			       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
+			       BGPAGE, dx_prev, dy_prev, c_apage, PSET);
 		if (object_get_state(bullet_obj) != DYING)
 		{
 			dx = OBJ2GFX(x_cur);
@@ -342,8 +369,18 @@ static void render_bullet_obj(obj_hdl_t bullet_obj)
 			boxfill(dx, dy, dx+size, dy+size, 15, PSET); // temporary
 
 /*			cpyv2v(BULLET_SX, BULLET_SY, BULLET_SX+size, BULLET_SY+size,
-				       GFXPAGE, dx, dy, GAMEPAGE, TPSET);*/
+				       GFXPAGE, dx, dy, c_apage, TPSET);*/
 		}
+		else
+		{
+			x_prev = object_get_x_prev_op(bullet_obj);
+			y_prev = object_get_y_prev_op(bullet_obj);
+			dx_prev = OBJ2GFX(x_prev);
+			dy_prev = OBJ2GFX(y_prev);
+			cpyv2v(dx_prev, dy_prev, dx_prev+size, dy_prev+size, 
+			       BGPAGE, dx_prev, dy_prev, c_dpage, PSET);
+		}
+					
 	}
 }
 
@@ -390,7 +427,7 @@ static void render_explosions()
 
 				tilesize--;
 				cpyv2v(dx_prev, dy_prev, dx_prev+tilesize, dy_prev+tilesize, 
-				       BGPAGE, dx_prev, dy_prev, GAMEPAGE, PSET);
+				       BGPAGE, dx_prev, dy_prev, c_apage, PSET);
 
 				state = object_get_state(the_explosions[i].explosion_obj);
 				if(state != DYING)
@@ -419,7 +456,16 @@ static void render_explosions()
 					dx = OBJ2GFX(x_cur);
 					dy = OBJ2GFX(y_cur);
 					cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE, dx, dy, 
-									GAMEPAGE, TPSET);
+									c_apage, TPSET);
+				}
+				else
+				{
+					x_prev = object_get_x_prev_op(the_explosions[i].explosion_obj);
+					y_prev = object_get_y_prev_op(the_explosions[i].explosion_obj);
+					dx_prev = OBJ2GFX(x_prev);
+					dy_prev = OBJ2GFX(y_prev);
+
+					cpyv2v(dx_prev, dy_prev, dx_prev+tilesize, dy_prev+tilesize, 				       BGPAGE, dx_prev, dy_prev, c_dpage, PSET);
 				}
 			}
 		}
@@ -448,7 +494,7 @@ static void render_ufo ()
 		tilesize = OBJ2GFX(object_get_size(ufo_obj)) - 1;
 		dx = OBJ2GFX(x_prev);
 		dy = OBJ2GFX(y_prev);
-		cpyv2v(dx,dy, dx+tilesize, dy+tilesize, BGPAGE, dx,dy, GAMEPAGE, PSET);
+		cpyv2v(dx,dy, dx+tilesize, dy+tilesize, BGPAGE, dx,dy, c_apage, PSET);
 
 		state = object_get_state(ufo_obj);
 		if(state != DYING)
@@ -457,8 +503,16 @@ static void render_ufo ()
 			dy = OBJ2GFX(y_cur);
 			sx = UFO_SX + anim_step * (tilesize + 1);
 			sy = UFO_SY;
-			cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE, dx, dy, GAMEPAGE,
+			cpyv2v(sx, sy, sx+tilesize, sy+tilesize, GFXPAGE, dx, dy, c_apage,
 							TPSET);
+		}
+		else
+		{
+			x_prev = object_get_x_prev_op(ufo_obj);
+			y_prev = object_get_y_prev_op(ufo_obj);
+			dx = OBJ2GFX(x_prev);
+			dy = OBJ2GFX(y_prev);
+			cpyv2v(dx,dy, dx+tilesize, dy+tilesize, BGPAGE, dx,dy, c_dpage, PSET);
 		}
 	}
 }

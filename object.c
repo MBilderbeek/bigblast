@@ -1,4 +1,4 @@
-/* $Id: object.c,v 1.6 2004/01/25 21:49:20 eric Exp $
+/* $Id: object.c,v 1.7 2004/01/27 22:26:47 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -12,6 +12,7 @@
 
 #include "object.h"
 #include "math.h"
+#include "glib.h"
 
 /*
  * LOCAL DEFINITIONS
@@ -42,8 +43,10 @@ void objects_init (void)
 	{
 		the_object->x = 0;
 		the_object->y = 0;
-		the_object->x_prev = 0;
-		the_object->y_prev = 0; 
+		the_object->x_prev[0] = 0;
+		the_object->x_prev[1] = 0;
+		the_object->y_prev[0] = 0; 
+		the_object->y_prev[1] = 0; 
 		the_object->dx = 0;
 		the_object->dy = 0;
 		the_object->size = 0;
@@ -67,8 +70,10 @@ obj_hdl_t object_create(int x, int y, char dx, char dy, int size)
 			the_object->x %= (OBJ_MAX_X - size);
 			the_object->y = y + OBJ_MAX_Y - size;
 			the_object->y %= (OBJ_MAX_Y - size);
-			the_object->x_prev = the_object->x; 
-			the_object->y_prev = the_object->y;
+			the_object->x_prev[0] = the_object->x; 
+			the_object->x_prev[1] = the_object->x; 
+			the_object->y_prev[0] = the_object->y;
+			the_object->y_prev[1] = the_object->y;
 			the_object->dx = dx;
 			the_object->dy = dy;
 			the_object->size = size;
@@ -112,13 +117,24 @@ void object_set_y(obj_hdl_t object, int y)
 
 int object_get_x_prev(obj_hdl_t object)
 {
-	return (objects[object].x_prev);
+	return (objects[object].x_prev[c_dpage]);
 }
 
 int object_get_y_prev(obj_hdl_t object)
 {
-	return (objects[object].y_prev);
+	return (objects[object].y_prev[c_dpage]);
 }
+
+int object_get_x_prev_op(obj_hdl_t object)
+{
+	return (objects[object].x_prev[c_apage]);
+}
+
+int object_get_y_prev_op(obj_hdl_t object)
+{
+	return (objects[object].y_prev[c_apage]);
+}
+
 int object_get_dx(obj_hdl_t object)
 {
 	return (objects[object].dx);
@@ -151,8 +167,8 @@ void object_move(obj_hdl_t object)
 	int temp; // wat een kutcompiler zeg!
 	int limit;
 
-	the_object->x_prev = the_object->x;
-	the_object->y_prev = the_object->y;
+	the_object->x_prev[c_dpage] = the_object->x;
+	the_object->y_prev[c_dpage] = the_object->y;
 	
 	limit = OBJ_MAX_X - the_object->size;
 	temp = the_object->x + the_object->dx;

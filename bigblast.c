@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.25 2003/05/29 22:48:10 manuel Exp $
+/* $Id: bigblast.c,v 1.26 2004/01/27 22:26:47 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -202,6 +202,7 @@ void play_level(char level)
 	if ((nof_asteroids-nof_steel_asteroids)==0)
 	{
 		add_bonus(level, noflives);
+		dedbuffer();
 		sprintf(string,"Wave %d completed!",level);
 		write_cent(string, MSG_BASE);
 		*JIFFY = 0;
@@ -226,6 +227,7 @@ void play_game()
 	if (noflives==0) // This means that !quit==TRUE implicitly
 	{
 		int ypos=MSG_BASE;
+		dedbuffer();
 		if (nof_asteroids-nof_steel_asteroids==0) ypos-=20;
 		
 		sprintf(string,"Game over!");
@@ -262,7 +264,7 @@ void main ()
 
 	do
 	{
-		cls();
+		menuscreen_init();
 		sprintf(string,"Welcome to Big Blast!");
 		write_cent(string, MSG_BASE);
 		sprintf(string,"High Score: %05d", hiscore);

@@ -1,4 +1,4 @@
-/* $Id: object.h,v 1.7 2004/01/25 21:49:20 eric Exp $
+/* $Id: object.h,v 1.8 2004/01/27 22:26:47 manuel Exp $
  *
  * AUTHOR(S)   : M. Bilderbeek & E. Boon
  *
@@ -48,8 +48,8 @@ typedef struct
 {
 	int x;
 	int y;
-	int x_prev;
-	int y_prev;
+	int x_prev[2];
+	int y_prev[2];
 	char dx;
 	char dy;
 	int size;
@@ -71,6 +71,8 @@ extern void object_destroy(obj_hdl_t *object);
 	extern void object_set_y(obj_hdl_t object, int y);
 	extern int object_get_x_prev(obj_hdl_t object);
 	extern int object_get_y_prev(obj_hdl_t object);
+	extern int object_get_x_prev_op(obj_hdl_t object);
+	extern int object_get_y_prev_op(obj_hdl_t object);
 	extern int object_get_dx(obj_hdl_t object);
 	extern int object_get_dy(obj_hdl_t object);
 	extern int object_get_size(obj_hdl_t object);
