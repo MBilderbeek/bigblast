@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.6 2002/11/28 23:21:14 manuel Exp $
+/* $Id: collisio.c,v 1.7 2003/01/03 18:11:10 eric Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -32,6 +32,11 @@
  * EXTERNAL FUNCTIONS
  */
 
+static int iabs(int i)
+{
+	return (i > 0)? i: -i;
+}
+
 static int get_ast_dia(ast_hdl_t i)
 {
 	int ast_dia;
@@ -59,8 +64,12 @@ char ship_hit(onoff_t shield)
 	char i, hit=0;
 	int ship_x = object_get_x(the_ship.ship_obj); 
 	int ship_y = object_get_y(the_ship.ship_obj); 
+	char ship_dx = object_get_dx(the_ship.ship_obj); 
+	char ship_dy = object_get_dy(the_ship.ship_obj);
+	char impulse;
+	obj_hdl_t ast_obj;
+	astsize_e ast_size;
 	int ast_x, ast_y;
-	int ast_ddx, ast_ddy;
 	int delta_x, delta_y, delta_dia;
 
 	ship_x += GFX2OBJ(SHIP_TILE_SIZE) >> 1;
@@ -70,29 +79,41 @@ char ship_hit(onoff_t shield)
 	{
 		if (the_asteroids[i].size != AST_NONE)
 		{
+			ast_obj = the_asteroids[i].asteroid_obj;
 			delta_dia = (get_ast_dia(i) + GFX2OBJ(SHIP_DIA)) >> 1;
-			ast_x = object_get_x(the_asteroids[i].asteroid_obj) + 
-				( GFX2OBJ(AST_TILE_SIZE) >> 1 );
+			ast_x = object_get_x(ast_obj) + ( GFX2OBJ(AST_TILE_SIZE) >> 1 );
 			delta_x = ast_x - ship_x;
-			if(delta_x < 0) delta_x = -delta_x;
-			if (delta_x <= delta_dia)
+			if (iabs(delta_x) <= delta_dia)
 			{
-				ast_y = object_get_y(the_asteroids[i].asteroid_obj) + 
-					( GFX2OBJ(AST_TILE_SIZE) >> 1 );
+				ast_y = object_get_y(ast_obj) + ( GFX2OBJ(AST_TILE_SIZE) >> 1 );
 				delta_y = ast_y - ship_y;
-				if(delta_y < 0) delta_y = -delta_y;
-			
-				if (delta_y <= delta_dia)
+				if (iabs(delta_y) <= delta_dia)
 				{
-					/* fake asteroid moving directly at ship,
-					 * so 'debris' will be moving away from ship
-					 * Some vector magic ;-)
-					 */
-					ast_ddx = - object_get_dx(the_asteroids[i].asteroid_obj) + delta_x;
-					ast_ddy = - object_get_dy(the_asteroids[i].asteroid_obj) + delta_y;
-					object_accel(the_asteroids[i].asteroid_obj, ast_ddx, ast_ddy);
+					/* calc speed of asteroid with respect to ship (ast's "impulse") */
+					delta_x = object_get_dx(ast_obj) - ship_dx;
+					delta_y = object_get_dy(ast_obj) - ship_dy;
+					ast_size = the_asteroids[i].size;
 
-					object_set_state(the_asteroids[i].asteroid_obj, DYING);
+					switch(ast_size)
+					{
+						case AST_SMALL:  impulse = 0; break;
+						case AST_MEDIUM: impulse = 1; break;
+						case AST_BIG:    impulse = 2; break;
+						default:;
+					}
+
+					/* ship gets (part of) ast's "impulse" */
+					object_accel(the_ship.ship_obj,
+						     delta_x >> (2 - impulse), delta_y >> (2 - impulse));
+
+					/* ast loses (part of) its "impulse" */
+					object_accel(ast_obj,
+						     -(delta_x >> impulse), -(delta_y >> impulse));
+
+					ship_dx = object_get_dx(the_ship.ship_obj); 
+					ship_dy = object_get_dy(the_ship.ship_obj); 
+					
+					object_set_state(ast_obj, DYING);
 					if (!shield) hit = 1;
 				}
 			}
@@ -151,13 +172,11 @@ void bullets_n_asteroids()
 					{
 						bx = object_get_x(the_bullets[b].bullet_obj);
 						dx = ax - bx;
-						if(dx < 0) dx = -dx;
-						if (dx <= dia)
+						if (iabs(dx) <= dia)
 						{
 							by = object_get_y(the_bullets[b].bullet_obj);
 							dy = ay - by;
-							if(dy < 0) dy = -dy;
-							if (dy <= dia)
+							if (iabs(dy) <= dia)
 							{
 								object_set_state(the_asteroids[i].asteroid_obj, DYING);
 								the_bullets[b].age = 1;
