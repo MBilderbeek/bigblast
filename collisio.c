@@ -1,4 +1,4 @@
-/* $Id: collisio.c,v 1.11 2003/02/16 15:34:01 eric Exp $
+/* $Id: collisio.c,v 1.12 2003/02/28 00:24:34 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -23,7 +23,7 @@
 
 #define AST_SHIP_SLACK GFX2OBJ(4)
 
-static void bullets_n_one_ast(obj_hdl_t ast_obj);
+static void bullets_n_one_ast(asteroid_t *ast);
 /*
  * EXTERNAL FUNCTIONS
  */
@@ -100,7 +100,13 @@ char ship_hit(void)
 					//	     -(delta_y >> ast_size));
 
 					
-					object_set_state(ast_obj, DYING);
+					if (!the_asteroids[i].steel)
+					    object_set_state(ast_obj, DYING);
+					else
+						object_accel(ast_obj,
+						    -(delta_x >> (4-ast_size)),
+						    -(delta_y >> (4-ast_size)));
+						
 					hit = 1;
 				}
 			}
@@ -140,7 +146,7 @@ void bullets_n_asteroids()
 				break;
 			case ALIVE:
 			case NEW:
-				bullets_n_one_ast(ast_obj);
+				bullets_n_one_ast(&the_asteroids[i]);
 				break;
 			default: break;
 			}
@@ -148,8 +154,9 @@ void bullets_n_asteroids()
 	}
 }
 
-static void bullets_n_one_ast(obj_hdl_t ast_obj)
+static void bullets_n_one_ast(asteroid_t *ast)
 {
+	obj_hdl_t ast_obj = ast->asteroid_obj;
 	int ax = get_center_x(ast_obj);
 	int ay = get_center_y(ast_obj);
 	int ast_dia = object_get_size(ast_obj) >> 1;
@@ -170,7 +177,15 @@ static void bullets_n_one_ast(obj_hdl_t ast_obj)
 				by = get_center_y(bul_obj);
 				if (iabs(ay-by) <= ast_dia + bul_dia)
 				{
-					object_set_state(ast_obj, DYING);
+					if (ast->steel)
+					{
+						bx = object_get_dx(bul_obj);
+						by = object_get_dy(bul_obj);
+						object_accel(ast_obj, (bx>>5),
+								(by>>5));
+					}
+					else
+						object_set_state(ast_obj, DYING);
 					the_bullets[b].age = 1;
 				}
 			}

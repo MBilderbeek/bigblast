@@ -1,4 +1,4 @@
-/* $Id: asteroid.c,v 1.11 2003/02/16 15:34:01 eric Exp $
+/* $Id: asteroid.c,v 1.12 2003/02/28 00:24:34 manuel Exp $
  * 
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -25,7 +25,8 @@
 
 asteroid_t the_asteroids[MAX_NOF_ASTEROIDS];
 
-unsigned int nof_asteroids;
+unsigned int nof_asteroids; // totaal
+unsigned int nof_steel_asteroids;
 
 /*
  * EXTERNAL FUNCTIONS
@@ -39,6 +40,7 @@ void asteroids_init()
 	{
 		the_asteroids[i].size = AST_NONE;
 		the_asteroids[i].asteroid_obj = OBJ_VOID;
+		the_asteroids[i].steel = 0;
 	}
 	nof_asteroids=0;
 }
@@ -58,7 +60,7 @@ void asteroids_move()
 	}
 }
 
-ast_hdl_t asteroid_create(int x, int y, astsize_e size)
+ast_hdl_t asteroid_create(int x, int y, astsize_e size, char steel)
 {
 	ast_hdl_t i;
 	int obj_size;
@@ -84,7 +86,9 @@ ast_hdl_t asteroid_create(int x, int y, astsize_e size)
 			the_asteroids[i].asteroid_obj = 
 				object_create (x, y, 0, 0, obj_size);
 			the_asteroids[i].size = size;
+			the_asteroids[i].steel = steel;
 			nof_asteroids++;
+			if (steel) nof_steel_asteroids++;
 			break;
 		}
 	}
@@ -106,10 +110,10 @@ void asteroid_destroy(ast_hdl_t ast)
 	if (size > AST_SMALL)
 	{
 		/* create 2 new ones */
-		the_new_ast = asteroid_create (x-(dy<<1), y+(dx<<1), size - 1);
+		the_new_ast = asteroid_create (x-(dy<<1), y+(dx<<1), size-1,0);
 		object_accel(the_asteroids[the_new_ast].asteroid_obj,
 			     (dx-dy)>>1, (dx+dy)>>1);
-		the_new_ast = asteroid_create (x+(dy<<1), y-(dx<<1), size - 1);
+		the_new_ast = asteroid_create (x+(dy<<1), y-(dx<<1), size-1,0);
 		object_accel(the_asteroids[the_new_ast].asteroid_obj,
 			     (dx+dy)>>1, (dy-dx)>>1);
 	}
@@ -123,3 +127,17 @@ void asteroid_destroy(ast_hdl_t ast)
 	explosion_create(x, y, (expsize_e) size, dx, dy);
 }
 
+void kill_all_asteroids(void)
+{
+	ast_hdl_t i;
+
+	for (i=0; i<MAX_NOF_ASTEROIDS; i++)
+	{
+		if (the_asteroids[i].asteroid_obj != OBJ_VOID)
+		{
+			object_destroy(&(the_asteroids[i].asteroid_obj));
+		}
+	}
+
+	nof_asteroids=nof_steel_asteroids=0; // opgeruimd staat netjes!
+}

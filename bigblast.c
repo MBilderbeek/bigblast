@@ -1,4 +1,4 @@
-/* $Id: bigblast.c,v 1.16 2003/02/20 23:23:08 manuel Exp $
+/* $Id: bigblast.c,v 1.17 2003/02/28 00:24:34 manuel Exp $
  *
  * AUTHOR      : M. Bilderbeek & E. Boon
  *
@@ -114,10 +114,10 @@ void play_level(char level)
 	asteroids_init();
 	explosions_init();
 	
-	for (i=0; i<0+level; i++) // Actually: load level data or so
+	for (i=0; i<1+level; i++) // Actually: load level data or so
 	{
 		a = asteroid_create(get_rnd_coord(OBJ_MAX_X), 
-				       get_rnd_coord(OBJ_MAX_Y), AST_BIG);
+				       get_rnd_coord(OBJ_MAX_Y), AST_BIG, i==0);
 		object_accel(the_asteroids[a].asteroid_obj,
 			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY), 
 			     rand() % (OBJ_MAX_DXY<<1)-(OBJ_MAX_DXY));
@@ -135,7 +135,8 @@ void play_level(char level)
 			if (boost==ON) ship_accel();
 			ship_move(); // en schiet op een beetje!
 			ship_shield_set(shield);
-			if (fire && nof_asteroids) bullet_fire();
+			if (fire && (nof_asteroids-nof_steel_asteroids)) 
+				bullet_fire();
 			if (object_get_state(the_ship.ship_obj)==DYING)
 			{
 				ship_destroy();
@@ -167,11 +168,12 @@ void play_level(char level)
 		explosions_move();
 
 		quit=check_quit();
-		not_finished=(nof_explosions || nof_bullets || (nof_asteroids &&
+		not_finished=(nof_explosions || nof_bullets || 
+				((nof_asteroids-nof_steel_asteroids) &&
 				noflives));
 	}
 	render_info(noflives); // update noflives on screen
-	if (nof_asteroids==0)
+	if ((nof_asteroids-nof_steel_asteroids)==0)
 	{
 		add_bonus(level, noflives);
 		sprintf(string,"Wave %d completed!",level);
@@ -180,6 +182,7 @@ void play_level(char level)
 		while (*JIFFY<100);
 		while (!keypressed());
 	}
+	kill_all_asteroids(); // kabang!
 }
 
 void play_game()
@@ -187,7 +190,7 @@ void play_game()
 	char string[100];
 	score = 0;
 	level = 0;
-	noflives=1;
+	noflives=5;
 
 	while (!quit && noflives>0)
 	{
@@ -197,7 +200,7 @@ void play_game()
 	if (noflives==0) // This means that !quit==TRUE implicitly
 	{
 		int ypos=MSG_BASE;
-		if (nof_asteroids==0) ypos-=20;
+		if (nof_asteroids-nof_steel_asteroids==0) ypos-=20;
 		
 		sprintf(string,"Game over!");
 		write_cent(string, ypos);

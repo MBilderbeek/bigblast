@@ -1,4 +1,7 @@
-$Id: ChangeLog,v 1.19 2003/02/20 23:23:08 manuel Exp $
+$Id: ChangeLog,v 1.20 2003/02/28 00:24:34 manuel Exp $
+
+2003/02/28 Manuel & Eric
+	* Added 'tink'able asteroids (steel!)
 
 2003/02/21 Manuel & Eric
 	* Shield-o-meter (TM) now works better. Perfectly, actually
